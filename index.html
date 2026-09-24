@@ -4,144 +4,299 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>猫パズル自動解答</title>
+
 <style>
-*{box-sizing:border-box}
-body{
-  margin:0;
-  background:#f5f7fb;
-  color:#1f2937;
-  font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans JP",sans-serif
+* {
+  box-sizing: border-box;
 }
-main{max-width:1200px;margin:auto;padding:24px}
-h1{margin:0 0 10px;font-size:28px}
-h2{margin:0 0 12px;font-size:20px}
-.card{
-  background:#fff;
-  border:1px solid #e1e5ea;
-  border-radius:16px;
-  padding:18px;
-  margin:16px 0;
-  box-shadow:0 4px 16px rgba(0,0,0,.05)
+
+body {
+  margin: 0;
+  background: #f5f7fb;
+  color: #1f2937;
+  font-family:
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    "Noto Sans JP",
+    sans-serif;
 }
-.controls{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
-button,.file-label{
-  border:0;border-radius:10px;padding:11px 16px;
-  font-weight:700;cursor:pointer;background:#2563eb;color:#fff
+
+main {
+  max-width: 1200px;
+  margin: auto;
+  padding: 24px;
 }
-button.secondary,.file-label.secondary{background:#edf1f5;color:#263241}
-button:disabled{opacity:.5;cursor:not-allowed}
-input[type=file]{display:none}
-.status{
-  margin-top:12px;padding:12px 14px;border-radius:10px;
-  background:#eef4ff;white-space:pre-wrap;line-height:1.6
+
+h1 {
+  margin: 0 0 10px;
+  font-size: 28px;
 }
-.status.ok{background:#eaf8f0;color:#11633a}
-.status.bad{background:#fff0ef;color:#9b241c}
-.preview{
-  display:block;max-width:100%;max-height:700px;
-  margin-top:14px;border:1px solid #dfe4ea;border-radius:12px
+
+h2 {
+  margin: 0 0 12px;
+  font-size: 20px;
 }
-.small{font-size:13px;color:#667085;line-height:1.7}
-.grid-wrap{overflow:auto;padding:8px}
-#grid{
-  display:grid;gap:3px;width:max-content;margin:auto
+
+.card {
+  background: #fff;
+  border: 1px solid #e1e5ea;
+  border-radius: 16px;
+  padding: 18px;
+  margin: 16px 0;
+  box-shadow: 0 4px 16px rgba(0,0,0,.05);
 }
-.cell{
-  width:42px;height:42px;border-radius:7px;
-  display:flex;align-items:center;justify-content:center;
-  border:1px solid rgba(255,255,255,.65);
-  font-size:25px;font-weight:700
+
+.controls {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
 }
-.cell.cat{
-  outline:3px solid #111;
-  outline-offset:-3px;
-  text-shadow:0 1px 2px #fff,0 -1px 2px #fff
+
+button,
+.file-label {
+  border: 0;
+  border-radius: 10px;
+  padding: 11px 16px;
+  font-weight: 700;
+  cursor: pointer;
+  background: #2563eb;
+  color: #fff;
 }
-.legend{display:flex;flex-wrap:wrap;gap:7px;margin-top:12px}
-.badge{padding:5px 9px;border-radius:999px;border:1px solid #dfe4ea;font-size:13px}
-ul{line-height:1.8}
+
+button.secondary,
+.file-label.secondary {
+  background: #edf1f5;
+  color: #263241;
+}
+
+button:disabled {
+  opacity: .5;
+  cursor: not-allowed;
+}
+
+input[type="file"] {
+  display: none;
+}
+
+.status {
+  margin-top: 12px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: #eef4ff;
+  white-space: pre-wrap;
+  line-height: 1.6;
+}
+
+.status.ok {
+  background: #eaf8f0;
+  color: #11633a;
+}
+
+.status.bad {
+  background: #fff0ef;
+  color: #9b241c;
+}
+
+.preview {
+  display: block;
+  max-width: 100%;
+  max-height: 700px;
+  margin-top: 14px;
+  border: 1px solid #dfe4ea;
+  border-radius: 12px;
+}
+
+.small {
+  font-size: 13px;
+  color: #667085;
+  line-height: 1.7;
+}
+
+.grid-wrap {
+  overflow: auto;
+  padding: 8px;
+}
+
+#grid {
+  display: grid;
+  gap: 3px;
+  width: max-content;
+  margin: auto;
+}
+
+.cell {
+  width: 42px;
+  height: 42px;
+  border-radius: 7px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(255,255,255,.65);
+  font-size: 25px;
+  font-weight: 700;
+}
+
+.cell.cat {
+  outline: 3px solid #111;
+  outline-offset: -3px;
+  text-shadow:
+    0 1px 2px #fff,
+    0 -1px 2px #fff;
+}
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-top: 12px;
+}
+
+.badge {
+  padding: 5px 9px;
+  border-radius: 999px;
+  border: 1px solid #dfe4ea;
+  font-size: 13px;
+}
+
+ul {
+  line-height: 1.8;
+}
 </style>
 </head>
 
+
 <body>
+
 <main>
 
-<h1>🐱 猫パズル自動解答</h1>
+  <h1>🐱 猫パズル自動解答</h1>
 
-<p>
-ゲームのスクリーンショットを読み込み、
-盤面を自動検出して猫の位置を解答します。
-4×4～20×20に対応しています。
-</p>
-
-<section class="card">
-
-<h2>1. スクリーンショットを読み込む</h2>
-
-<div class="controls">
-
-<label class="file-label" for="file">
-画像を選択
-</label>
-
-<button id="solveBtn" disabled>
-読み取って解く
-</button>
-
-<button id="clearBtn" class="secondary">
-クリア
-</button>
-
-<input id="file" type="file" accept="image/*">
-
-</div>
-
-<p class="small">
-ゲーム盤全体が入ったスクリーンショットを選んでください。
-上部の説明、猫アイコン、下部のアイコンなどが一緒に写っていても、
-盤面だけを自動的に探します。
-</p>
-
-<div id="status" class="status">
-画像を選択してください。
-</div>
-
-<div id="previewBox"></div>
-
-</section>
+  <p>
+    ゲームのスクリーンショットを読み込み、
+    盤面を自動検出して猫の位置を解答します。
+    4×4～20×20に対応しています。
+  </p>
 
 
-<section class="card">
+  <!-- ==================================================
+       画像読み込み
+  ================================================== -->
 
-<h2>2. 解答</h2>
+  <section class="card">
 
-<div id="info" class="small">
-まだ解析していません。
-</div>
+    <h2>1. スクリーンショットを読み込む</h2>
 
-<div class="grid-wrap">
-<div id="grid"></div>
-</div>
+    <div class="controls">
 
-<div id="legend" class="legend"></div>
+      <label class="file-label" for="file">
+        画像を選択
+      </label>
 
-</section>
+      <button id="solveBtn" disabled>
+        読み取って解く
+      </button>
+
+      <button id="clearBtn" class="secondary">
+        クリア
+      </button>
+
+      <input
+        id="file"
+        type="file"
+        accept="image/*"
+      >
+
+    </div>
 
 
-<section class="card">
+    <p class="small">
+      ゲーム盤全体が入ったスクリーンショットを選んでください。<br>
+      上部の説明、猫アイコン、下部のアイコンなどが一緒に写っていても、
+      盤面だけを自動的に探します。
+    </p>
 
-<h2>ルール</h2>
 
-<ul>
-<li>1色につき猫は1匹</li>
-<li>同じ行に猫を2匹置かない</li>
-<li>同じ列に猫を2匹置かない</li>
-<li>縦・横・斜めに隣り合う位置には猫を置かない</li>
-</ul>
+    <div
+      id="status"
+      class="status"
+    >
+      画像を選択してください。
+    </div>
 
-</section>
+
+    <div id="previewBox"></div>
+
+  </section>
+
+
+
+  <!-- ==================================================
+       解答表示
+  ================================================== -->
+
+  <section class="card">
+
+    <h2>2. 解答</h2>
+
+    <div
+      id="info"
+      class="small"
+    >
+      まだ解析していません。
+    </div>
+
+
+    <div class="grid-wrap">
+
+      <div id="grid"></div>
+
+    </div>
+
+
+    <div
+      id="legend"
+      class="legend"
+    ></div>
+
+  </section>
+
+
+
+  <!-- ==================================================
+       ルール
+  ================================================== -->
+
+  <section class="card">
+
+    <h2>ルール</h2>
+
+    <ul>
+
+      <li>
+        1色につき猫は1匹
+      </li>
+
+      <li>
+        同じ行に猫を2匹置かない
+      </li>
+
+      <li>
+        同じ列に猫を2匹置かない
+      </li>
+
+      <li>
+        縦・横・斜めに隣り合う位置には猫を置かない
+      </li>
+
+    </ul>
+
+  </section>
 
 </main>
+
 
 
 <script>
@@ -149,9 +304,19 @@ ul{line-height:1.8}
 "use strict";
 
 
+
+/* ==================================================
+   基本設定
+================================================== */
+
 const MIN_SIZE = 4;
 const MAX_SIZE = 20;
 
+
+
+/* ==================================================
+   HTML要素
+================================================== */
 
 const fileInput =
   document.getElementById("file");
@@ -181,9 +346,10 @@ const legendEl =
 let selectedFile = null;
 
 
-/* =====================================================
+
+/* ==================================================
    ファイル選択
-   ===================================================== */
+================================================== */
 
 fileInput.addEventListener(
   "change",
@@ -197,6 +363,7 @@ fileInput.addEventListener(
 
 
     gridEl.innerHTML = "";
+
     legendEl.innerHTML = "";
 
     infoEl.textContent =
@@ -214,7 +381,6 @@ fileInput.addEventListener(
       );
 
       return;
-
     }
 
 
@@ -259,9 +425,10 @@ fileInput.addEventListener(
 );
 
 
-/* =====================================================
+
+/* ==================================================
    クリア
-   ===================================================== */
+================================================== */
 
 clearBtn.addEventListener(
   "click",
@@ -290,16 +457,18 @@ clearBtn.addEventListener(
 );
 
 
-/* =====================================================
+
+/* ==================================================
    解答開始
-   ===================================================== */
+================================================== */
 
 solveBtn.addEventListener(
   "click",
   async () => {
 
-    if (!selectedFile)
+    if (!selectedFile) {
       return;
+    }
 
 
     solveBtn.disabled = true;
@@ -413,15 +582,16 @@ solveBtn.addEventListener(
 );
 
 
-/* =====================================================
-   ステータス
-   ===================================================== */
+
+/* ==================================================
+   ステータス表示
+================================================== */
 
 function setStatus(
   text,
-  bad=false,
-  ok=false
-){
+  bad = false,
+  ok = false
+) {
 
   statusEl.textContent =
     text;
@@ -440,14 +610,15 @@ function setStatus(
 }
 
 
-/* =====================================================
-   画像読み込み
-   ===================================================== */
 
-function loadImage(file){
+/* ==================================================
+   画像読み込み
+================================================== */
+
+function loadImage(file) {
 
   return new Promise(
-    (resolve,reject) => {
+    (resolve, reject) => {
 
       const url =
         URL.createObjectURL(file);
@@ -487,11 +658,12 @@ function loadImage(file){
 }
 
 
-/* =====================================================
-   Canvas
-   ===================================================== */
 
-function getImageData(img){
+/* ==================================================
+   Canvasへ画像を読み込む
+================================================== */
+
+function getImageData(img) {
 
   const maxW = 1500;
 
@@ -538,7 +710,7 @@ function getImageData(img){
     canvas.getContext(
       "2d",
       {
-        willReadFrequently:true
+        willReadFrequently: true
       }
     );
 
@@ -571,15 +743,16 @@ function getImageData(img){
 }
 
 
-/* =====================================================
-   色付き正方形の検出
-   ===================================================== */
+
+/* ==================================================
+   色付きマス候補を検出
+================================================== */
 
 function detectComponents(
   imageData,
   width,
   height
-){
+) {
 
   const data =
     imageData.data;
@@ -594,64 +767,76 @@ function detectComponents(
 
 
   /*
-   * 色付きピクセルを探す
+   * 色のあるピクセルを探す
    */
 
   for (
-    let i=0;
-    i<n;
+    let i = 0;
+    i < n;
     i++
-  ){
+  ) {
 
     const r =
-      data[i*4];
+      data[i * 4];
 
     const g =
-      data[i*4+1];
+      data[i * 4 + 1];
 
     const b =
-      data[i*4+2];
+      data[i * 4 + 2];
 
     const a =
-      data[i*4+3];
+      data[i * 4 + 3];
 
 
-    if(a<80)
+    if (a < 80) {
       continue;
+    }
 
 
     const max =
       Math.max(
-        r,g,b
+        r,
+        g,
+        b
       );
 
 
     const min =
       Math.min(
-        r,g,b
+        r,
+        g,
+        b
       );
 
 
     const avg =
-      (r+g+b)/3;
+      (r + g + b) / 3;
 
 
-    if(
-      avg<45 ||
-      avg>248
-    )
+    /*
+     * 白・黒・灰色を除外
+     */
+
+    if (
+      avg < 45 ||
+      avg > 248
+    ) {
       continue;
+    }
 
 
-    if(
-      max-min<18
-    )
+    if (
+      max - min < 18
+    ) {
       continue;
+    }
 
 
-    mask[i]=1;
+    mask[i] = 1;
 
   }
+
 
 
   const visited =
@@ -662,205 +847,226 @@ function detectComponents(
     new Int32Array(n);
 
 
-  const components=[];
+  const components = [];
 
 
-  for(
-    let sy=0;
-    sy<height;
+  /*
+   * 連結成分を探す
+   */
+
+  for (
+    let sy = 0;
+    sy < height;
     sy++
-  ){
+  ) {
 
-    for(
-      let sx=0;
-      sx<width;
+    for (
+      let sx = 0;
+      sx < width;
       sx++
-    ){
+    ) {
 
       const start =
-        sy*width+sx;
+        sy * width + sx;
 
 
-      if(
+      if (
         !mask[start] ||
         visited[start]
-      )
+      ) {
         continue;
+      }
 
 
-      let head=0;
-
-      let tail=0;
+      let head = 0;
+      let tail = 0;
 
 
       queue[tail++] =
         start;
 
 
-      visited[start]=1;
+      visited[start] = 1;
 
 
-      let minX=sx;
+      let minX = sx;
+      let maxX = sx;
 
-      let maxX=sx;
-
-      let minY=sy;
-
-      let maxY=sy;
+      let minY = sy;
+      let maxY = sy;
 
 
-      let area=0;
+      let area = 0;
 
 
-      let sumX=0;
-
-      let sumY=0;
-
-
-      let sumR=0;
-
-      let sumG=0;
-
-      let sumB=0;
+      let sumX = 0;
+      let sumY = 0;
 
 
-      while(
-        head<tail
-      ){
+      let sumR = 0;
+      let sumG = 0;
+      let sumB = 0;
+
+
+
+      while (
+        head < tail
+      ) {
 
         const p =
           queue[head++];
 
 
         const x =
-          p%width;
+          p % width;
 
 
         const y =
           Math.floor(
-            p/width
+            p / width
           );
 
 
         const di =
-          p*4;
+          p * 4;
 
 
         const r =
           data[di];
 
         const g =
-          data[di+1];
+          data[di + 1];
 
         const b =
-          data[di+2];
+          data[di + 2];
 
 
         area++;
 
 
         sumX += x;
-
         sumY += y;
 
 
         sumR += r;
-
         sumG += g;
-
         sumB += b;
 
 
-        if(x<minX)
-          minX=x;
+        if (x < minX) {
+          minX = x;
+        }
 
 
-        if(x>maxX)
-          maxX=x;
+        if (x > maxX) {
+          maxX = x;
+        }
 
 
-        if(y<minY)
-          minY=y;
+        if (y < minY) {
+          minY = y;
+        }
 
 
-        if(y>maxY)
-          maxY=y;
+        if (y > maxY) {
+          maxY = y;
+        }
 
 
-        if(x>0){
+
+        /*
+         * 左
+         */
+
+        if (x > 0) {
 
           const q =
-            p-1;
+            p - 1;
 
 
-          if(
+          if (
             mask[q] &&
             !visited[q]
-          ){
+          ) {
 
-            visited[q]=1;
+            visited[q] = 1;
 
-            queue[tail++]=q;
+            queue[tail++] = q;
 
           }
 
         }
 
 
-        if(x<width-1){
+
+        /*
+         * 右
+         */
+
+        if (x < width - 1) {
 
           const q =
-            p+1;
+            p + 1;
 
 
-          if(
+          if (
             mask[q] &&
             !visited[q]
-          ){
+          ) {
 
-            visited[q]=1;
+            visited[q] = 1;
 
-            queue[tail++]=q;
+            queue[tail++] = q;
 
           }
 
         }
 
 
-        if(y>0){
+
+        /*
+         * 上
+         */
+
+        if (y > 0) {
 
           const q =
-            p-width;
+            p - width;
 
 
-          if(
+          if (
             mask[q] &&
             !visited[q]
-          ){
+          ) {
 
-            visited[q]=1;
+            visited[q] = 1;
 
-            queue[tail++]=q;
+            queue[tail++] = q;
 
           }
 
         }
 
 
-        if(y<height-1){
+
+        /*
+         * 下
+         */
+
+        if (y < height - 1) {
 
           const q =
-            p+width;
+            p + width;
 
 
-          if(
+          if (
             mask[q] &&
             !visited[q]
-          ){
+          ) {
 
-            visited[q]=1;
+            visited[q] = 1;
 
-            queue[tail++]=q;
+            queue[tail++] = q;
 
           }
 
@@ -869,54 +1075,55 @@ function detectComponents(
       }
 
 
+
       const w =
-        maxX-minX+1;
+        maxX - minX + 1;
 
 
       const h =
-        maxY-minY+1;
+        maxY - minY + 1;
 
 
       const ratio =
-        w/h;
+        w / h;
 
 
       /*
-       * 猫アイコンなどの細長いものを除外
+       * 正方形に近いものだけ残す
        */
 
-      if(
-        area>=80 &&
-        w>=8 &&
-        h>=8 &&
-        ratio>=0.70 &&
-        ratio<=1.43
-      ){
+      if (
+        area >= 80 &&
+        w >= 8 &&
+        h >= 8 &&
+        ratio >= 0.70 &&
+        ratio <= 1.43
+      ) {
 
         components.push({
 
           area,
 
-          width:w,
+          width: w,
 
-          height:h,
+          height: h,
 
           cx:
-            sumX/area,
+            sumX / area,
 
           cy:
-            sumY/area,
+            sumY / area,
 
-          color:{
+          color: {
 
             r:
-              sumR/area,
+              sumR / area,
 
             g:
-              sumG/area,
+              sumG / area,
 
             b:
-              sumB/area
+              sumB / area
 
           }
 
@@ -934,90 +1141,103 @@ function detectComponents(
 }
 
 
-/* =====================================================
+
+/* ==================================================
    中央値
-   ===================================================== */
+================================================== */
 
-function median(arr){
+function median(arr) {
 
-  if(!arr.length)
+  if (!arr.length) {
     return 0;
+  }
 
 
   const a =
     [...arr].sort(
-      (x,y)=>x-y
+      (x, y) => x - y
     );
 
 
   const m =
     Math.floor(
-      a.length/2
+      a.length / 2
     );
 
 
+  if (
+    a.length % 2
+  ) {
+
+    return a[m];
+
+  }
+
+
   return (
-    a.length%2
-      ? a[m]
-      : (a[m-1]+a[m])/2
-  );
+    a[m - 1] + a[m]
+  ) / 2;
 
 }
 
 
-/* =====================================================
-   座標グループ化
-   ===================================================== */
+
+/* ==================================================
+   X/Y座標をグループ化
+================================================== */
 
 function clusterCenters(
   values,
   tolerance
-){
+) {
 
-  if(!values.length)
+  if (!values.length) {
     return [];
+  }
 
 
   const sorted =
     [...values].sort(
-      (a,b)=>a-b
+      (a, b) => a - b
     );
 
 
   const groups =
-    [[sorted[0]]];
+    [
+      [sorted[0]]
+    ];
 
 
-  for(
-    let i=1;
-    i<sorted.length;
+  for (
+    let i = 1;
+    i < sorted.length;
     i++
-  ){
+  ) {
 
     const g =
       groups[
-        groups.length-1
+        groups.length - 1
       ];
 
 
     const center =
       g.reduce(
-        (s,v)=>s+v,
+        (s, v) => s + v,
         0
-      )/g.length;
+      ) / g.length;
 
 
-    if(
+    if (
       Math.abs(
-        sorted[i]-center
-      )<=tolerance
-    ){
+        sorted[i] - center
+      ) <= tolerance
+    ) {
 
       g.push(
         sorted[i]
       );
 
-    }else{
+    } else {
 
       groups.push(
         [sorted[i]]
@@ -1029,13 +1249,13 @@ function clusterCenters(
 
 
   return groups.map(
-    g=>({
+    g => ({
 
       center:
         g.reduce(
-          (s,v)=>s+v,
+          (s, v) => s + v,
           0
-        )/g.length,
+        ) / g.length,
 
       count:
         g.length
@@ -1046,30 +1266,34 @@ function clusterCenters(
 }
 
 
-/* =====================================================
-   規則性
-   ===================================================== */
 
-function regularity(groups){
+/* ==================================================
+   グリッドの規則性
+================================================== */
 
-  if(
-    groups.length<2
-  )
+function regularity(groups) {
+
+  if (
+    groups.length < 2
+  ) {
+
     return Infinity;
 
+  }
 
-  const diffs=[];
+
+  const diffs = [];
 
 
-  for(
-    let i=1;
-    i<groups.length;
+  for (
+    let i = 1;
+    i < groups.length;
     i++
-  ){
+  ) {
 
     diffs.push(
       groups[i].center -
-      groups[i-1].center
+      groups[i - 1].center
     );
 
   }
@@ -1079,16 +1303,21 @@ function regularity(groups){
     median(diffs);
 
 
-  if(med<=0)
+  if (
+    med <= 0
+  ) {
+
     return Infinity;
+
+  }
 
 
   return (
     diffs.reduce(
-      (s,d)=>
-        s+
+      (s, d) =>
+        s +
         Math.abs(
-          d-med
+          d - med
         ),
       0
     )
@@ -1101,45 +1330,53 @@ function regularity(groups){
 }
 
 
-/* =====================================================
-   最も規則的なグリッド
-   ===================================================== */
+
+/* ==================================================
+   最も規則的な範囲を探す
+================================================== */
 
 function bestWindow(
   groups,
-  minSize=MIN_SIZE,
-  maxSize=MAX_SIZE
-){
+  minSize = MIN_SIZE,
+  maxSize = MAX_SIZE
+) {
 
-  if(
-    groups.length<minSize
-  )
+  if (
+    groups.length < minSize
+  ) {
+
     return null;
 
+  }
 
-  let best=null;
+
+  let best = null;
 
 
-  for(
-    let size=
+  for (
+    let size =
       Math.min(
         maxSize,
         groups.length
       );
-    size>=minSize;
-    size--
-  ){
 
-    for(
-      let start=0;
-      start+size<=groups.length;
+    size >= minSize;
+
+    size--
+  ) {
+
+    for (
+      let start = 0;
+
+      start + size <= groups.length;
+
       start++
-    ){
+    ) {
 
       const sub =
         groups.slice(
           start,
-          start+size
+          start + size
         );
 
 
@@ -1149,14 +1386,14 @@ function bestWindow(
         );
 
 
-      if(
+      if (
         !best ||
-        score<best.score
-      ){
+        score < best.score
+      ) {
 
-        best={
+        best = {
 
-          groups:sub,
+          groups: sub,
 
           score
 
@@ -1167,11 +1404,14 @@ function bestWindow(
     }
 
 
-    if(
+    if (
       best &&
-      best.score<0.08
-    )
+      best.score < 0.08
+    ) {
+
       break;
+
+    }
 
   }
 
@@ -1181,11 +1421,12 @@ function bestWindow(
 }
 
 
-/* =====================================================
-   ゲーム盤検出
-   ===================================================== */
 
-function detectBoard(img){
+/* ==================================================
+   ゲーム盤検出
+================================================== */
+
+function detectBoard(img) {
 
   const {
 
@@ -1197,100 +1438,106 @@ function detectBoard(img){
     getImageData(img);
 
 
+
+  /*
+   * 色付きマスを検出
+   */
+
   const components =
     detectComponents(
-      {data},
+      data,
       width,
       height
     );
 
 
-  if(
-    components.length<
-    MIN_SIZE*MIN_SIZE
-  ){
+  /*
+   * 最低でも4×4必要
+   */
+
+  if (
+    components.length <
+    MIN_SIZE * MIN_SIZE
+  ) {
 
     throw new Error(
-      "色付きの正方形マスを十分に検出できませんでした。"
+      "色付きの正方形マスを十分に検出できませんでした。\n" +
+      "ゲーム盤全体が写ったスクリーンショットを使用してください。"
     );
 
   }
 
 
+
   const areas =
     components.map(
-      c=>c.area
+      c => c.area
     );
 
 
   const widths =
     components.map(
-      c=>c.width
+      c => c.width
     );
 
 
   const heights =
     components.map(
-      c=>c.height
+      c => c.height
     );
 
 
   const areaMed =
-    median(
-      areas
-    );
+    median(areas);
 
 
   const wMed =
-    median(
-      widths
-    );
+    median(widths);
 
 
   const hMed =
-    median(
-      heights
-    );
+    median(heights);
+
 
 
   /*
-   * 盤面のマスは
-   * 面積・幅・高さが似ている。
+   * 本物のゲームマスは
+   * 大きさがほぼ同じ。
    */
 
   const cells =
     components.filter(
-      c=>{
+      c => {
 
         return (
 
-          c.area>=
-            areaMed*0.45
+          c.area >=
+          areaMed * 0.45
 
           &&
 
-          c.area<=
-            areaMed*1.8
+          c.area <=
+          areaMed * 1.8
 
           &&
 
-          c.width>=
-            wMed*0.55
+          c.width >=
+          wMed * 0.55
 
           &&
 
-          c.width<=
-            wMed*1.45
+          c.width <=
+          wMed * 1.45
 
           &&
 
-          c.height>=
-            hMed*0.55
+          c.height >=
+          hMed * 0.55
 
           &&
 
-          c.height<=
-            hMed*1.45
+          c.height <=
+          hMed * 1.45
 
         );
 
@@ -1298,36 +1545,43 @@ function detectBoard(img){
     );
 
 
-  if(
-    cells.length<
-    MIN_SIZE*MIN_SIZE
-  ){
+
+  if (
+    cells.length <
+    MIN_SIZE * MIN_SIZE
+  ) {
 
     throw new Error(
-      "ゲーム盤らしいマスを十分に検出できませんでした。"
+      "ゲーム盤らしいマスを十分に検出できませんでした。\n" +
+      "ゲーム画面そのもののスクリーンショットを使用してください。"
     );
 
   }
 
 
+
+  /*
+   * X/Y座標をまとめる
+   */
+
   const xTol =
     Math.max(
       8,
-      wMed*0.55
+      wMed * 0.55
     );
 
 
   const yTol =
     Math.max(
       8,
-      hMed*0.55
+      hMed * 0.55
     );
 
 
   const xGroups =
     clusterCenters(
       cells.map(
-        c=>c.cx
+        c => c.cx
       ),
       xTol
     );
@@ -1336,11 +1590,16 @@ function detectBoard(img){
   const yGroups =
     clusterCenters(
       cells.map(
-        c=>c.cy
+        c => c.cy
       ),
       yTol
     );
 
+
+
+  /*
+   * 最も規則的なグリッドを選択
+   */
 
   const xBest =
     bestWindow(
@@ -1354,16 +1613,17 @@ function detectBoard(img){
     );
 
 
-  if(
+  if (
     !xBest ||
     !yBest
-  ){
+  ) {
 
     throw new Error(
       "規則正しく並んだゲーム盤を見つけられませんでした。"
     );
 
   }
+
 
 
   const xs =
@@ -1382,12 +1642,17 @@ function detectBoard(img){
     ys.length;
 
 
-  if(
-    rows<MIN_SIZE ||
-    cols<MIN_SIZE ||
-    rows>MAX_SIZE ||
-    cols>MAX_SIZE
-  ){
+
+  /*
+   * 4×4～20×20
+   */
+
+  if (
+    rows < MIN_SIZE ||
+    cols < MIN_SIZE ||
+    rows > MAX_SIZE ||
+    cols > MAX_SIZE
+  ) {
 
     throw new Error(
       `対応範囲は${MIN_SIZE}×${MIN_SIZE}～${MAX_SIZE}×${MAX_SIZE}です。`
@@ -1396,24 +1661,25 @@ function detectBoard(img){
   }
 
 
+
   /*
    * 各マスの中心から直接色を取得
    */
 
-  const samples=[];
+  const samples = [];
 
 
-  for(
-    let r=0;
-    r<rows;
+  for (
+    let r = 0;
+    r < rows;
     r++
-  ){
+  ) {
 
-    for(
-      let c=0;
-      c<cols;
+    for (
+      let c = 0;
+      c < cols;
       c++
-    ){
+    ) {
 
       const sample =
         sampleCellColor(
@@ -1427,10 +1693,10 @@ function detectBoard(img){
         );
 
 
-      if(!sample){
+      if (!sample) {
 
         throw new Error(
-          `${r+1}行${c+1}列の色を読み取れませんでした。`
+          `${r + 1}行${c + 1}列の色を読み取れませんでした。`
         );
 
       }
@@ -1444,6 +1710,11 @@ function detectBoard(img){
 
   }
 
+
+
+  /*
+   * 色を分類
+   */
 
   const colors =
     normalizeColors(
@@ -1461,16 +1732,17 @@ function detectBoard(img){
     unique.size;
 
 
+
   /*
    * このゲームは
-   * 1色につき1匹なので、
-   * 10×10なら10色。
+   * 1色に1匹なので、
+   * 10×10なら10色
    */
 
-  if(
-    colorCount!==rows ||
-    colorCount!==cols
-  ){
+  if (
+    colorCount !== rows ||
+    colorCount !== cols
+  ) {
 
     throw new Error(
       `盤面は${rows}×${cols}として検出しましたが、色が${colorCount}種類になりました。\n` +
@@ -1478,6 +1750,7 @@ function detectBoard(img){
     );
 
   }
+
 
 
   return {
@@ -1495,9 +1768,10 @@ function detectBoard(img){
 }
 
 
-/* =====================================================
+
+/* ==================================================
    マス中央の色を取得
-   ===================================================== */
+================================================== */
 
 function sampleCellColor(
   data,
@@ -1507,13 +1781,13 @@ function sampleCellColor(
   cy,
   cellW,
   cellH
-){
+) {
 
   const rx =
     Math.max(
       2,
       Math.floor(
-        cellW*0.22
+        cellW * 0.22
       )
     );
 
@@ -1522,104 +1796,131 @@ function sampleCellColor(
     Math.max(
       2,
       Math.floor(
-        cellH*0.22
+        cellH * 0.22
       )
     );
 
 
-  let sr=0;
+  let sr = 0;
+  let sg = 0;
+  let sb = 0;
 
-  let sg=0;
-
-  let sb=0;
-
-  let count=0;
+  let count = 0;
 
 
-  for(
-    let y=
-      Math.round(cy-ry);
-    y<=
-      Math.round(cy+ry);
+
+  for (
+    let y =
+      Math.round(
+        cy - ry
+      );
+
+    y <=
+      Math.round(
+        cy + ry
+      );
+
     y++
-  ){
+  ) {
 
-    if(
-      y<0 ||
-      y>=height
-    )
+    if (
+      y < 0 ||
+      y >= height
+    ) {
+
       continue;
 
+    }
 
-    for(
-      let x=
-        Math.round(cx-rx);
-      x<=
-        Math.round(cx+rx);
+
+    for (
+      let x =
+        Math.round(
+          cx - rx
+        );
+
+      x <=
+        Math.round(
+          cx + rx
+        );
+
       x++
-    ){
+    ) {
 
-      if(
-        x<0 ||
-        x>=width
-      )
+      if (
+        x < 0 ||
+        x >= width
+      ) {
+
         continue;
+
+      }
 
 
       const i =
-        (y*width+x)*4;
+        (y * width + x) * 4;
 
 
       const r =
         data[i];
 
       const g =
-        data[i+1];
+        data[i + 1];
 
       const b =
-        data[i+2];
+        data[i + 2];
 
       const a =
-        data[i+3];
+        data[i + 3];
 
 
-      if(a<80)
+      if (
+        a < 80
+      ) {
+
         continue;
+
+      }
 
 
       const max =
         Math.max(
-          r,g,b
+          r,
+          g,
+          b
         );
 
 
       const min =
         Math.min(
-          r,g,b
+          r,
+          g,
+          b
         );
 
 
       const avg =
-        (r+g+b)/3;
+        (r + g + b) / 3;
 
 
       /*
        * 白い隙間などを除外
        */
 
-      if(
-        avg>248 ||
-        avg<30 ||
-        max-min<10
-      )
+      if (
+        avg > 248 ||
+        avg < 30 ||
+        max - min < 10
+      ) {
+
         continue;
 
+      }
 
-      sr+=r;
 
-      sg+=g;
-
-      sb+=b;
+      sr += r;
+      sg += g;
+      sb += b;
 
       count++;
 
@@ -1628,73 +1929,82 @@ function sampleCellColor(
   }
 
 
-  if(!count)
+
+  if (
+    !count
+  ) {
+
     return null;
+
+  }
 
 
   return {
 
-    r:sr/count,
+    r:
+      sr / count,
 
-    g:sg/count,
+    g:
+      sg / count,
 
-    b:sb/count
+    b:
+      sb / count
 
   };
 
 }
 
 
-/* =====================================================
-   RGB距離
-   ===================================================== */
 
-function rgbDist(a,b){
+/* ==================================================
+   RGB色距離
+================================================== */
+
+function rgbDist(a, b) {
 
   return Math.hypot(
 
-    a.r-b.r,
+    a.r - b.r,
 
-    a.g-b.g,
+    a.g - b.g,
 
-    a.b-b.b
+    a.b - b.b
 
   );
 
 }
 
 
-/* =====================================================
+
+/* ==================================================
    色を分類
-   ===================================================== */
+================================================== */
 
 function normalizeColors(
   samples
-){
+) {
 
-  const palette=[];
+  const palette = [];
 
 
   /*
-   * 今回のゲームは
-   * 淡い色が使われているので、
-   * 大きすぎないしきい値にする。
+   * 色の近さ
    */
 
-  const threshold=35;
+  const threshold = 35;
 
 
-  for(
-    const s
-    of samples
-  ){
 
-    if(
+  for (
+    const s of samples
+  ) {
+
+    if (
       !s ||
       !Number.isFinite(s.r) ||
       !Number.isFinite(s.g) ||
       !Number.isFinite(s.b)
-    ){
+    ) {
 
       throw new Error(
         "マスの色を読み取れませんでした。"
@@ -1703,16 +2013,17 @@ function normalizeColors(
     }
 
 
-    let best=-1;
+    let best = -1;
 
-    let bestD=Infinity;
+    let bestD = Infinity;
 
 
-    for(
-      let i=0;
-      i<palette.length;
+
+    for (
+      let i = 0;
+      i < palette.length;
       i++
-    ){
+    ) {
 
       const d =
         rgbDist(
@@ -1721,68 +2032,82 @@ function normalizeColors(
         );
 
 
-      if(
-        d<bestD
-      ){
+      if (
+        d < bestD
+      ) {
 
-        bestD=d;
+        bestD = d;
 
-        best=i;
+        best = i;
 
       }
 
     }
 
 
-    if(
-      best===-1 ||
-      bestD>threshold
-    ){
+
+    if (
+      best === -1 ||
+      bestD > threshold
+    ) {
 
       palette.push(
-        {...s}
+        {
+          r: s.r,
+          g: s.g,
+          b: s.b
+        }
       );
 
-    }else{
+    } else {
+
+      /*
+       * パレットを少し更新
+       */
 
       palette[best].r =
         (
-          palette[best].r+
+          palette[best].r +
           s.r
-        )/2;
+        ) / 2;
 
 
       palette[best].g =
         (
-          palette[best].g+
+          palette[best].g +
           s.g
-        )/2;
+        ) / 2;
 
 
       palette[best].b =
         (
-          palette[best].b+
+          palette[best].b +
           s.b
-        )/2;
+        ) / 2;
 
     }
 
   }
 
 
+
+  /*
+   * 各マスを最も近い色に分類
+   */
+
   return samples.map(
-    s=>{
+    s => {
 
-      let best=0;
+      let best = 0;
 
-      let bestD=Infinity;
+      let bestD = Infinity;
 
 
-      for(
-        let i=0;
-        i<palette.length;
+      for (
+        let i = 0;
+        i < palette.length;
         i++
-      ){
+      ) {
 
         const d =
           rgbDist(
@@ -1791,13 +2116,13 @@ function normalizeColors(
           );
 
 
-        if(
-          d<bestD
-        ){
+        if (
+          d < bestD
+        ) {
 
-          bestD=d;
+          bestD = d;
 
-          best=i;
+          best = i;
 
         }
 
@@ -1812,15 +2137,16 @@ function normalizeColors(
 }
 
 
-/* =====================================================
+
+/* ==================================================
    パズルを解く
-   ===================================================== */
+================================================== */
 
 function solvePuzzle(
   colors,
   rows,
   cols
-){
+) {
 
   const colorCount =
     new Set(
@@ -1828,14 +2154,20 @@ function solvePuzzle(
     ).size;
 
 
-  if(
-    colorCount!==rows ||
-    colorCount!==cols
-  ){
+
+  /*
+   * 1色＝1行＝1列
+   */
+
+  if (
+    colorCount !== rows ||
+    colorCount !== cols
+  ) {
 
     return null;
 
   }
+
 
 
   /*
@@ -1845,34 +2177,36 @@ function solvePuzzle(
   const positionsByColor =
     Array.from(
       {
-        length:colorCount
+        length:
+          colorCount
       },
-      ()=>[]
+      () => []
     );
 
 
-  for(
-    let r=0;
-    r<rows;
-    r++
-  ){
 
-    for(
-      let c=0;
-      c<cols;
+  for (
+    let r = 0;
+    r < rows;
+    r++
+  ) {
+
+    for (
+      let c = 0;
+      c < cols;
       c++
-    ){
+    ) {
 
       const color =
         colors[
-          r*cols+c
+          r * cols + c
         ];
 
 
       positionsByColor[
         color
       ].push(
-        [r,c]
+        [r, c]
       );
 
     }
@@ -1880,11 +2214,20 @@ function solvePuzzle(
   }
 
 
+
+  /*
+   * 配置済み猫
+   */
+
   const assigned =
     Array(
       colorCount
     ).fill(null);
 
+
+  /*
+   * 使用済み行
+   */
 
   const usedRows =
     new Uint8Array(
@@ -1892,62 +2235,81 @@ function solvePuzzle(
     );
 
 
+  /*
+   * 使用済み列
+   */
+
   const usedCols =
     new Uint8Array(
       cols
     );
 
 
-  /*
-   * その場所に猫を置けるか
-   */
+
+  /* ==================================================
+     猫を置けるか
+  ================================================== */
 
   function canPlace(
     r,
     c
-  ){
+  ) {
 
-    if(
+    /*
+     * 同じ行禁止
+     */
+
+    if (
       usedRows[r]
-    )
+    ) {
+
       return false;
 
+    }
 
-    if(
+
+    /*
+     * 同じ列禁止
+     */
+
+    if (
       usedCols[c]
-    )
+    ) {
+
       return false;
+
+    }
 
 
     /*
      * 8方向隣接禁止
      */
 
-    for(
-      const p
-      of assigned
-    ){
+    for (
+      const p of assigned
+    ) {
 
-      if(!p)
+      if (!p) {
         continue;
+      }
 
 
       const dr =
         Math.abs(
-          p[0]-r
+          p[0] - r
         );
 
 
       const dc =
         Math.abs(
-          p[1]-c
+          p[1] - c
         );
 
 
-      if(
-        dr<=1 &&
-        dc<=1
-      ){
+      if (
+        dr <= 1 &&
+        dc <= 1
+      ) {
 
         return false;
 
@@ -1961,33 +2323,34 @@ function solvePuzzle(
   }
 
 
-  /*
-   * 候補を取得
-   */
+
+  /* ==================================================
+     候補位置
+  ================================================== */
 
   function getCandidates(
     color
-  ){
+  ) {
 
-    const result=[];
+    const result = [];
 
 
-    for(
-      const [r,c]
+    for (
+      const [r, c]
       of positionsByColor[
         color
       ]
-    ){
+    ) {
 
-      if(
+      if (
         canPlace(
           r,
           c
         )
-      ){
+      ) {
 
         result.push(
-          [r,c]
+          [r, c]
         );
 
       }
@@ -2000,27 +2363,33 @@ function solvePuzzle(
   }
 
 
-  let nodes=0;
+
+  let nodes = 0;
 
 
   const NODE_LIMIT =
     3000000;
 
 
-  /*
-   * バックトラック
-   */
+
+  /* ==================================================
+     バックトラック
+  ================================================== */
 
   function dfs(
     done
-  ){
+  ) {
 
     nodes++;
 
 
-    if(
-      nodes>NODE_LIMIT
-    ){
+    /*
+     * 無限探索防止
+     */
+
+    if (
+      nodes > NODE_LIMIT
+    ) {
 
       return null;
 
@@ -2031,12 +2400,12 @@ function solvePuzzle(
      * 全色配置済み
      */
 
-    if(
-      done===colorCount
-    ){
+    if (
+      done === colorCount
+    ) {
 
       return assigned.map(
-        p=>[
+        p => [
           p[0],
           p[1]
         ]
@@ -2045,25 +2414,31 @@ function solvePuzzle(
     }
 
 
+
     /*
-     * 候補が最も少ない色から処理
+     * 候補が少ない色を
+     * 優先的に処理
      */
 
-    let bestColor=-1;
+    let bestColor = -1;
 
-    let best=null;
+    let best = null;
 
 
-    for(
-      let color=0;
-      color<colorCount;
+
+    for (
+      let color = 0;
+      color < colorCount;
       color++
-    ){
+    ) {
 
-      if(
+      if (
         assigned[color]
-      )
+      ) {
+
         continue;
+
+      }
 
 
       const candidates =
@@ -2072,20 +2447,25 @@ function solvePuzzle(
         );
 
 
-      if(
-        candidates.length===0
-      ){
+      /*
+       * 候補ゼロなら
+       * このルートは失敗
+       */
+
+      if (
+        candidates.length === 0
+      ) {
 
         return null;
 
       }
 
 
-      if(
+      if (
         !best ||
-        candidates.length<
+        candidates.length <
         best.length
-      ){
+      ) {
 
         best =
           candidates;
@@ -2098,34 +2478,42 @@ function solvePuzzle(
     }
 
 
+
     /*
-     * 候補を順番に試す
+     * 候補を試す
      */
 
-    for(
-      const [r,c]
+    for (
+      const [r, c]
       of best
-    ){
+    ) {
 
       assigned[
         bestColor
       ] =
-        [r,c];
+        [r, c];
 
 
-      usedRows[r]=1;
+      usedRows[r] = 1;
 
-      usedCols[c]=1;
+      usedCols[c] = 1;
+
 
 
       const result =
         dfs(
-          done+1
+          done + 1
         );
 
 
-      if(result)
+      if (
+        result
+      ) {
+
         return result;
+
+      }
+
 
 
       /*
@@ -2137,9 +2525,9 @@ function solvePuzzle(
       ] = null;
 
 
-      usedRows[r]=0;
+      usedRows[r] = 0;
 
-      usedCols[c]=0;
+      usedCols[c] = 0;
 
     }
 
@@ -2149,26 +2537,28 @@ function solvePuzzle(
   }
 
 
+
   return dfs(0);
 
 }
 
 
-/* =====================================================
+
+/* ==================================================
    表示色
-   ===================================================== */
+================================================== */
 
 function colorToCss(
   id,
   count
-){
+) {
 
   const hue =
     (
-      id*
-      360/
+      id *
+      360 /
       count
-    )%360;
+    ) % 360;
 
 
   return (
@@ -2178,29 +2568,34 @@ function colorToCss(
 }
 
 
-/* =====================================================
+
+/* ==================================================
    盤面表示
-   ===================================================== */
+================================================== */
 
 function renderBoard(
   colors,
   rows,
   cols,
   solution
-){
+) {
 
   gridEl.innerHTML = "";
 
 
   gridEl.style.gridTemplateColumns =
-    `repeat(${cols},42px)`;
+    `repeat(${cols}, 42px)`;
 
+
+  /*
+   * 猫の位置をSetにする
+   */
 
   const catSet =
     new Set(
-      (solution||[])
+      (solution || [])
         .map(
-          ([r,c]) =>
+          ([r, c]) =>
             `${r},${c}`
         )
     );
@@ -2212,17 +2607,22 @@ function renderBoard(
     ).size;
 
 
-  for(
-    let r=0;
-    r<rows;
-    r++
-  ){
 
-    for(
-      let c=0;
-      c<cols;
+  /*
+   * マスを表示
+   */
+
+  for (
+    let r = 0;
+    r < rows;
+    r++
+  ) {
+
+    for (
+      let c = 0;
+      c < cols;
       c++
-    ){
+    ) {
 
       const cell =
         document.createElement(
@@ -2236,7 +2636,7 @@ function renderBoard(
 
       const id =
         colors[
-          r*cols+c
+          r * cols + c
         ];
 
 
@@ -2248,14 +2648,19 @@ function renderBoard(
 
 
       cell.title =
-        `${r+1}行 ${c+1}列 / 色${id+1}`;
+        `${r + 1}行 ${c + 1}列 / 色${id + 1}`;
 
 
-      if(
+
+      /*
+       * 猫がいるマス
+       */
+
+      if (
         catSet.has(
           `${r},${c}`
         )
-      ){
+      ) {
 
         cell.classList.add(
           "cat"
@@ -2277,14 +2682,19 @@ function renderBoard(
   }
 
 
+
+  /*
+   * 色一覧
+   */
+
   legendEl.innerHTML = "";
 
 
-  for(
-    let i=0;
-    i<count;
+  for (
+    let i = 0;
+    i < count;
     i++
-  ){
+  ) {
 
     const badge =
       document.createElement(
@@ -2297,7 +2707,7 @@ function renderBoard(
 
 
     badge.textContent =
-      `色${i+1}`;
+      `色${i + 1}`;
 
 
     badge.style.background =
