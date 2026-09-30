@@ -1,474 +1,256 @@
 <!DOCTYPE html>
 <html lang="ja">
-
 <head>
-
 <meta charset="UTF-8">
-
-<meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
->
-
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>猫パズル自動解答</title>
 
-
 <style>
-
-/* ================================
-   基本
-================================ */
-
-* {
-    box-sizing: border-box;
+*{
+  box-sizing:border-box;
 }
 
-body {
-
-    margin: 0;
-
-    background: #f5f7fb;
-
-    color: #222;
-
-    font-family:
-        system-ui,
-        -apple-system,
-        BlinkMacSystemFont,
-        "Segoe UI",
-        "Noto Sans JP",
-        sans-serif;
+body{
+  margin:0;
+  background:#f5f7fb;
+  color:#222;
+  font-family:system-ui,-apple-system,"Noto Sans JP",sans-serif;
 }
 
-
-main {
-
-    width: min(1200px, 100%);
-
-    margin: 0 auto;
-
-    padding: 24px;
-
+main{
+  width:min(1100px,100%);
+  margin:auto;
+  padding:24px;
 }
 
-
-h1 {
-
-    margin-top: 0;
-
+.card{
+  background:#fff;
+  border-radius:16px;
+  padding:20px;
+  margin-bottom:20px;
+  box-shadow:0 4px 20px #0000000d;
 }
 
-
-.card {
-
-    background: white;
-
-    border-radius: 16px;
-
-    padding: 20px;
-
-    margin-bottom: 20px;
-
-    box-shadow:
-        0 4px 20px rgba(0,0,0,0.06);
-
+h1{
+  margin-top:0;
 }
 
-
-.controls {
-
-    display: flex;
-
-    gap: 10px;
-
-    flex-wrap: wrap;
-
+.controls{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
 }
-
 
 button,
-.fileButton {
-
-    border: none;
-
-    border-radius: 10px;
-
-    padding: 12px 18px;
-
-    font-size: 15px;
-
-    font-weight: bold;
-
-    cursor: pointer;
-
-    background: #2563eb;
-
-    color: white;
-
+.fileButton{
+  border:0;
+  border-radius:10px;
+  padding:12px 18px;
+  font-weight:700;
+  font-size:15px;
+  cursor:pointer;
+  background:#2563eb;
+  color:#fff;
 }
 
-
-button:hover,
-.fileButton:hover {
-
-    opacity: .9;
-
+.secondary{
+  background:#e9eef5;
+  color:#222;
 }
 
-
-button:disabled {
-
-    opacity: .5;
-
-    cursor: default;
-
+button:disabled{
+  opacity:.5;
+  cursor:default;
 }
 
-
-.secondary {
-
-    background: #e9eef5 !important;
-
-    color: #222 !important;
-
+input[type=file]{
+  display:none;
 }
 
-
-input[type="file"] {
-
-    display: none;
-
+.small{
+  font-size:13px;
+  color:#666;
+  line-height:1.7;
 }
 
-
-.status {
-
-    margin-top: 15px;
-
-    padding: 14px;
-
-    border-radius: 10px;
-
-    background: #edf4ff;
-
-    line-height: 1.7;
-
-    white-space: pre-wrap;
-
+.status{
+  margin-top:15px;
+  padding:14px;
+  border-radius:10px;
+  background:#edf4ff;
+  white-space:pre-wrap;
+  line-height:1.7;
 }
 
-
-.status.ok {
-
-    background: #e9f8ef;
-
-    color: #166534;
-
+.status.ok{
+  background:#e9f8ef;
+  color:#166534;
 }
 
-
-.status.error {
-
-    background: #fff0f0;
-
-    color: #991b1b;
-
+.status.error{
+  background:#fff0f0;
+  color:#991b1b;
 }
 
-
-.preview {
-
-    display: block;
-
-    max-width: 100%;
-
-    max-height: 750px;
-
-    margin-top: 15px;
-
-    border-radius: 12px;
-
-    border: 1px solid #ddd;
-
+.preview{
+  display:block;
+  max-width:100%;
+  max-height:700px;
+  margin-top:15px;
+  border:1px solid #ddd;
+  border-radius:12px;
 }
 
-
-.small {
-
-    color: #666;
-
-    font-size: 13px;
-
-    line-height: 1.7;
-
+.gridArea{
+  overflow:auto;
+  padding:15px;
 }
 
-
-.gridArea {
-
-    overflow: auto;
-
-    padding: 15px;
-
+#resultGrid{
+  display:grid;
+  width:max-content;
+  margin:auto;
+  gap:4px;
 }
 
-
-#resultGrid {
-
-    display: grid;
-
-    width: max-content;
-
-    margin: auto;
-
-    gap: 4px;
-
+.gridCell{
+  width:42px;
+  height:42px;
+  border-radius:7px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:25px;
+  border:2px solid #ffffffb0;
 }
 
-
-.gridCell {
-
-    width: 45px;
-
-    height: 45px;
-
-    border-radius: 7px;
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: center;
-
-    font-size: 27px;
-
-    border: 2px solid rgba(255,255,255,.7);
-
+.gridCell.cat{
+  outline:3px solid #111;
+  outline-offset:-3px;
 }
 
-
-.gridCell.cat {
-
-    outline: 3px solid #111;
-
-    outline-offset: -3px;
-
+.info{
+  white-space:pre-wrap;
+  line-height:1.8;
 }
 
-
-.info {
-
-    white-space: pre-wrap;
-
-    line-height: 1.8;
-
+.legend{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin-top:15px;
 }
 
-
-.legend {
-
-    display: flex;
-
-    flex-wrap: wrap;
-
-    gap: 8px;
-
-    margin-top: 15px;
-
+.legendItem{
+  padding:6px 10px;
+  border-radius:20px;
+  font-size:13px;
 }
 
-
-.legendItem {
-
-    padding: 6px 10px;
-
-    border-radius: 20px;
-
-    font-size: 13px;
-
+.debug{
+  margin-top:15px;
+  padding:12px;
+  background:#f4f4f4;
+  border-radius:10px;
+  font:12px monospace;
+  white-space:pre-wrap;
+  overflow:auto;
 }
-
-
-.debug {
-
-    margin-top: 15px;
-
-    padding: 12px;
-
-    background: #f4f4f4;
-
-    border-radius: 10px;
-
-    font-family: monospace;
-
-    font-size: 12px;
-
-    overflow: auto;
-
-}
-
 </style>
-
 </head>
-
 
 <body>
 
-
 <main>
-
 
 <h1>🐱 猫パズル自動解答</h1>
 
-
 <div class="card">
 
-
-<h2>
-1. スクリーンショットを読み込む
-</h2>
-
+<h2>1. スクリーンショットを読み込む</h2>
 
 <div class="controls">
 
-
-<label
-    class="fileButton"
-    for="imageInput"
->
-    画像を選択
+<label class="fileButton" for="imageInput">
+画像を選択
 </label>
 
-
-<button
-    id="solveButton"
-    disabled
->
-    読み取って解く
+<button id="solveButton" disabled>
+読み取って解く
 </button>
 
-
-<button
-    id="clearButton"
-    class="secondary"
->
-    クリア
+<button id="clearButton" class="secondary">
+クリア
 </button>
-
 
 <input
-    id="imageInput"
-    type="file"
-    accept="image/*"
+  id="imageInput"
+  type="file"
+  accept="image/*"
 >
-
 
 </div>
 
-
 <p class="small">
 
-<strong>重要</strong><br>
+<strong>重要：</strong><br>
+
+この版はレベル103の実画像から取得した10色のカラーコードを基準に認識します。<br>
 
 ゲーム画面そのもののスクリーンショットを選択してください。<br>
 
-今回のゲームは10×10の盤面を自動認識します。<br>
-
-サイトの画面をさらにスクリーンショットした画像ではなく、
+ブラウザ上のこのサイトをさらに撮影した画像ではなく、
 元のゲーム画像を選択してください。
 
 </p>
 
-
-<div
-    id="status"
-    class="status"
->
+<div id="status" class="status">
 画像を選択してください。
 </div>
 
-
 <div id="preview"></div>
-
 
 </div>
 
 
-
 <div class="card">
 
+<h2>2. 解答</h2>
 
-<h2>
-2. 解答
-</h2>
-
-
-<div
-    id="info"
-    class="info"
->
+<div id="info" class="info">
 まだ解析していません。
 </div>
 
-
 <div class="gridArea">
-
 <div id="resultGrid"></div>
-
 </div>
 
+<div id="legend" class="legend"></div>
 
-<div
-    id="legend"
-    class="legend"
-></div>
-
-
-<div
-    id="debug"
-    class="debug"
-    style="display:none"
-></div>
-
+<div id="debug" class="debug" style="display:none"></div>
 
 </div>
-
 
 
 <div class="card">
 
-
-<h2>
-ゲームのルール
-</h2>
-
+<h2>ゲームのルール</h2>
 
 <ul>
 
-<li>
-1色につき猫は1匹
-</li>
+<li>1色につき猫は1匹</li>
 
-<li>
-同じ行に猫を2匹置かない
-</li>
+<li>同じ行に猫を2匹置かない</li>
 
-<li>
-同じ列に猫を2匹置かない
-</li>
+<li>同じ列に猫を2匹置かない</li>
 
-<li>
-上下左右だけでなく斜めも隣接禁止
-</li>
+<li>上下左右・斜めを含め、猫同士は隣接禁止</li>
 
 </ul>
 
-
 </div>
 
-
 </main>
-
 
 
 <script>
@@ -476,2648 +258,2187 @@ input[type="file"] {
 "use strict";
 
 
+/*
+==================================================
+ゲームで使用される10色
+==================================================
 
-/* =====================================================
-   HTML
-===================================================== */
+レベル103の実際の画像から取得した色を基準にします。
 
-const imageInput =
-    document.getElementById(
-        "imageInput"
-    );
+画像から勝手に10色を作る方式ではなく、
+各マスの色をこの10色と比較します。
+*/
+
+const GAME_COLORS=[
+
+  {
+    name:"黄色",
+    r:227,
+    g:188,
+    b:73
+  },
+
+  {
+    name:"青緑",
+    r:72,
+    g:181,
+    b:178
+  },
+
+  {
+    name:"赤",
+    r:213,
+    g:115,
+    b:117
+  },
+
+  {
+    name:"紫",
+    r:151,
+    g:120,
+    b:214
+  },
+
+  {
+    name:"ピンク",
+    r:235,
+    g:133,
+    b:183
+  },
+
+  {
+    name:"薄ピンク",
+    r:249,
+    g:180,
+    b:208
+  },
+
+  {
+    name:"薄青",
+    r:166,
+    g:191,
+    b:215
+  },
+
+  {
+    name:"茶色",
+    r:173,
+    g:111,
+    b:72
+  },
+
+  {
+    name:"水色",
+    r:106,
+    g:188,
+    b:230
+  },
+
+  {
+    name:"緑",
+    r:173,
+    g:217,
+    b:148
+  }
+
+];
 
 
-const solveButton =
-    document.getElementById(
-        "solveButton"
-    );
+/*
+色の認識許容範囲
+
+スクリーンショットの圧縮や
+ブラウザによる多少の色変化を許容します。
+*/
+
+const COLOR_TOLERANCE=70;
 
 
-const clearButton =
-    document.getElementById(
-        "clearButton"
-    );
+const imageInput=
+  document.getElementById("imageInput");
+
+const solveButton=
+  document.getElementById("solveButton");
+
+const clearButton=
+  document.getElementById("clearButton");
+
+const statusBox=
+  document.getElementById("status");
+
+const preview=
+  document.getElementById("preview");
+
+const info=
+  document.getElementById("info");
+
+const resultGrid=
+  document.getElementById("resultGrid");
+
+const legend=
+  document.getElementById("legend");
+
+const debugBox=
+  document.getElementById("debug");
 
 
-const statusBox =
-    document.getElementById(
-        "status"
-    );
+let selectedFile=null;
 
 
-const preview =
-    document.getElementById(
-        "preview"
-    );
+/*
+==================================================
+ステータス表示
+==================================================
+*/
 
+function setStatus(text,type=""){
 
-const info =
-    document.getElementById(
-        "info"
-    );
+  statusBox.textContent=text;
 
-
-const resultGrid =
-    document.getElementById(
-        "resultGrid"
-    );
-
-
-const legend =
-    document.getElementById(
-        "legend"
-    );
-
-
-const debugBox =
-    document.getElementById(
-        "debug"
-    );
-
-
-let selectedFile = null;
-
-
-
-/* =====================================================
-   ステータス
-===================================================== */
-
-function setStatus(
-    text,
-    type = ""
-) {
-
-    statusBox.textContent = text;
-
-    statusBox.className =
-        "status " + type;
+  statusBox.className=
+    "status "+type;
 
 }
 
 
+/*
+==================================================
+画像選択
+==================================================
+*/
 
-/* =====================================================
-   画像選択
-===================================================== */
+imageInput.addEventListener("change",()=>{
 
-imageInput.addEventListener(
-    "change",
-    function() {
+  selectedFile=
+    imageInput.files?.[0] || null;
 
-        selectedFile =
-            this.files &&
-            this.files.length
-                ? this.files[0]
-                : null;
+  resultGrid.innerHTML="";
 
+  legend.innerHTML="";
 
-        resultGrid.innerHTML = "";
+  debugBox.style.display="none";
 
-        legend.innerHTML = "";
+  info.textContent=
+    "まだ解析していません。";
 
-        debugBox.style.display =
-            "none";
 
+  if(!selectedFile){
 
-        info.textContent =
-            "まだ解析していません。";
+    solveButton.disabled=true;
 
+    preview.innerHTML="";
 
-        if (!selectedFile) {
-
-            solveButton.disabled =
-                true;
-
-            preview.innerHTML =
-                "";
-
-            setStatus(
-                "画像を選択してください。"
-            );
-
-            return;
-
-        }
-
-
-        const url =
-            URL.createObjectURL(
-                selectedFile
-            );
-
-
-        const img =
-            document.createElement(
-                "img"
-            );
-
-
-        img.src = url;
-
-        img.className =
-            "preview";
-
-
-        preview.innerHTML =
-            "";
-
-
-        preview.appendChild(
-            img
-        );
-
-
-        solveButton.disabled =
-            false;
-
-
-        setStatus(
-            "画像を読み込みました。"
-        );
-
-    }
-);
-
-
-
-/* =====================================================
-   クリア
-===================================================== */
-
-clearButton.addEventListener(
-    "click",
-    function() {
-
-        selectedFile = null;
-
-        imageInput.value = "";
-
-        preview.innerHTML =
-            "";
-
-        resultGrid.innerHTML =
-            "";
-
-        legend.innerHTML =
-            "";
-
-        debugBox.innerHTML =
-            "";
-
-        debugBox.style.display =
-            "none";
-
-        info.textContent =
-            "まだ解析していません。";
-
-        solveButton.disabled =
-            true;
-
-        setStatus(
-            "画像を選択してください。"
-        );
-
-    }
-);
-
-
-
-/* =====================================================
-   解く
-===================================================== */
-
-solveButton.addEventListener(
-    "click",
-    async function() {
-
-        if (!selectedFile) {
-            return;
-        }
-
-
-        solveButton.disabled =
-            true;
-
-
-        try {
-
-            setStatus(
-                "① 画像を解析しています…"
-            );
-
-
-            const img =
-                await loadImage(
-                    selectedFile
-                );
-
-
-            setStatus(
-                "② 色付きマスを探しています…"
-            );
-
-
-            const board =
-                detectBoard(
-                    img
-                );
-
-
-            setStatus(
-                "③ 盤面を認識しました。\n" +
-                `サイズ：${board.rows} × ${board.cols}\n` +
-                `色：${board.colorCount}色`
-            );
-
-
-            showDebug(
-                board
-            );
-
-
-            setStatus(
-                "④ 色を判定しています…"
-            );
-
-
-            const normalized =
-                normalizeBoardColors(
-                    board.colors,
-                    board.rows,
-                    board.cols
-                );
-
-
-            if (
-                normalized.colorCount !==
-                board.rows
-            ) {
-
-                throw new Error(
-
-                    "盤面は認識できましたが、" +
-                    "色の種類を正しく認識できませんでした。\n\n" +
-
-                    `認識された色：${normalized.colorCount}色\n` +
-
-                    `盤面：${board.rows}×${board.cols}。\n\n` +
-
-                    "ゲーム画面そのものの画像を使用してください。"
-
-                );
-
-            }
-
-
-            setStatus(
-                "⑤ 猫を配置しています…"
-            );
-
-
-            const solution =
-                solvePuzzle(
-                    normalized.colors,
-                    board.rows,
-                    board.cols
-                );
-
-
-            drawResult(
-                normalized.colors,
-                board.rows,
-                board.cols,
-                solution
-            );
-
-
-            if (!solution) {
-
-                info.textContent =
-
-                    "盤面は認識できましたが、" +
-                    "現在の色判定では解答が見つかりませんでした。\n\n" +
-
-                    "色の判定をさらに自動調整します。";
-
-
-                setStatus(
-                    "盤面は認識できましたが、解答が見つかりませんでした。",
-                    "error"
-                );
-
-            }
-            else {
-
-                const positions =
-                    solution
-                        .map(
-                            p =>
-                                `${p[0] + 1}行${p[1] + 1}列`
-                        )
-                        .join("、");
-
-
-                info.textContent =
-
-                    `猫の数：${solution.length}匹\n` +
-
-                    `猫の位置：${positions}`;
-
-
-                setStatus(
-                    "解答が見つかりました！\n" +
-                    "🐱の場所が猫を置く位置です。",
-                    "ok"
-                );
-
-            }
-
-
-        }
-        catch (error) {
-
-            console.error(error);
-
-
-            setStatus(
-                "読み取りに失敗しました。\n\n" +
-                error.message,
-                "error"
-            );
-
-
-            info.textContent =
-                "認識できませんでした。";
-
-        }
-        finally {
-
-            solveButton.disabled =
-                false;
-
-        }
-
-    }
-);
-
-
-
-/* =====================================================
-   画像読み込み
-===================================================== */
-
-function loadImage(file) {
-
-    return new Promise(
-        (resolve, reject) => {
-
-            const url =
-                URL.createObjectURL(
-                    file
-                );
-
-
-            const img =
-                new Image();
-
-
-            img.onload =
-                () => {
-
-                    URL.revokeObjectURL(
-                        url
-                    );
-
-                    resolve(img);
-
-                };
-
-
-            img.onerror =
-                () => {
-
-                    URL.revokeObjectURL(
-                        url
-                    );
-
-                    reject(
-                        new Error(
-                            "画像を開けませんでした。"
-                        )
-                    );
-
-                };
-
-
-            img.src = url;
-
-        }
+    setStatus(
+      "画像を選択してください。"
     );
 
-}
+    return;
+
+  }
 
 
-
-/* =====================================================
-   Canvas
-===================================================== */
-
-function makeCanvasImage(
-    img
-) {
-
-    const MAX_WIDTH = 1800;
+  const url=
+    URL.createObjectURL(selectedFile);
 
 
-    let scale = 1;
+  const img=
+    document.createElement("img");
 
 
-    if (
-        img.naturalWidth >
-        MAX_WIDTH
-    ) {
+  img.src=url;
 
-        scale =
-            MAX_WIDTH /
-            img.naturalWidth;
-
-    }
+  img.className="preview";
 
 
-    const width =
-        Math.round(
-            img.naturalWidth *
-            scale
-        );
+  preview.innerHTML="";
+
+  preview.appendChild(img);
 
 
-    const height =
-        Math.round(
-            img.naturalHeight *
-            scale
-        );
+  solveButton.disabled=false;
 
 
-    const canvas =
-        document.createElement(
-            "canvas"
-        );
+  setStatus(
+    "画像を読み込みました。"
+  );
+
+});
 
 
-    canvas.width =
-        width;
+/*
+==================================================
+クリア
+==================================================
+*/
 
-    canvas.height =
-        height;
+clearButton.addEventListener("click",()=>{
+
+  selectedFile=null;
+
+  imageInput.value="";
+
+  preview.innerHTML="";
+
+  resultGrid.innerHTML="";
+
+  legend.innerHTML="";
+
+  debugBox.innerHTML="";
+
+  debugBox.style.display="none";
+
+  info.textContent=
+    "まだ解析していません。";
+
+  solveButton.disabled=true;
+
+  setStatus(
+    "画像を選択してください。"
+  );
+
+});
 
 
-    const ctx =
-        canvas.getContext(
-            "2d",
-            {
-                willReadFrequently:
-                    true
-            }
-        );
+/*
+==================================================
+解析開始
+==================================================
+*/
+
+solveButton.addEventListener("click",async()=>{
+
+  if(!selectedFile)return;
+
+  solveButton.disabled=true;
 
 
-    ctx.drawImage(
-        img,
-        0,
-        0,
-        width,
-        height
+  try{
+
+    setStatus(
+      "① 画像を解析しています…"
     );
 
 
-    return {
+    const img=
+      await loadImage(selectedFile);
 
-        data:
-            ctx.getImageData(
-                0,
-                0,
-                width,
-                height
-            ),
 
-        width,
+    setStatus(
+      "② ゲームの10色を探しています…"
+    );
 
-        height
+
+    const board=
+      detectBoard(img);
+
+
+    setStatus(
+      `③ 盤面を認識しました。
+サイズ：${board.rows}×${board.cols}`
+    );
+
+
+    showDebug(board);
+
+
+    /*
+    ここが以前のコードの問題だった部分です。
+
+    board.colorCountを参照するのではなく、
+    実際に認識した色番号をSetに入れて
+    何色認識できたかを調べます。
+    */
+
+    const recognizedColorCount=
+      new Set(board.colors).size;
+
+
+    if(recognizedColorCount!==10){
+
+      throw new Error(
+
+        `10色すべてを認識できませんでした。
+
+認識された色数：
+${recognizedColorCount}
+
+各マスの中央色を、
+登録済みの10色と照合しています。
+
+ゲーム画面そのものの元画像を
+選択しているか確認してください。`
+
+      );
+
+    }
+
+
+    setStatus(
+      "④ 各マスを10色のカラーコードと照合しています…"
+    );
+
+
+    setStatus(
+      "⑤ 猫の配置を計算しています…"
+    );
+
+
+    const solution=
+      solvePuzzle(
+        board.colors,
+        board.rows,
+        board.cols
+      );
+
+
+    drawResult(
+      board.colors,
+      board.rows,
+      board.cols,
+      solution
+    );
+
+
+    if(!solution){
+
+      info.textContent=
+
+        "盤面と10色は認識できましたが、現在のルールでは解が見つかりませんでした。\n"+
+        "色の誤認識が残っている可能性があります。";
+
+
+      setStatus(
+        "解答が見つかりませんでした。",
+        "error"
+      );
+
+
+    }else{
+
+      const positions=
+        solution
+          .map(
+            p=>`${p[0]+1}行${p[1]+1}列`
+          )
+          .join("、");
+
+
+      info.textContent=
+
+        `猫の数：${solution.length}匹\n`+
+        `猫の位置：${positions}`;
+
+
+      setStatus(
+
+        "解答が見つかりました！\n"+
+        "黒い枠＋🐱のマスが猫を置く場所です。",
+
+        "ok"
+
+      );
+
+    }
+
+
+  }catch(e){
+
+    console.error(e);
+
+
+    setStatus(
+      "読み取りに失敗しました。\n\n"+
+      e.message,
+      "error"
+    );
+
+
+    info.textContent=
+      "認識できませんでした。";
+
+
+  }finally{
+
+    solveButton.disabled=false;
+
+  }
+
+});
+
+
+/*
+==================================================
+画像読み込み
+==================================================
+*/
+
+function loadImage(file){
+
+  return new Promise((resolve,reject)=>{
+
+    const url=
+      URL.createObjectURL(file);
+
+    const img=
+      new Image();
+
+
+    img.onload=()=>{
+
+      URL.revokeObjectURL(url);
+
+      resolve(img);
 
     };
 
+
+    img.onerror=()=>{
+
+      URL.revokeObjectURL(url);
+
+      reject(
+        new Error(
+          "画像を開けませんでした。"
+        )
+      );
+
+    };
+
+
+    img.src=url;
+
+  });
+
 }
 
 
+/*
+==================================================
+Canvasに画像を展開
+==================================================
+*/
 
-/* =====================================================
-   RGB
-===================================================== */
+function makeCanvasImage(img){
 
-function rgbDistance(
-    a,
-    b
-) {
+  const MAX_WIDTH=1800;
 
-    return Math.sqrt(
 
-        (a.r - b.r) *
-        (a.r - b.r)
+  const scale=
+    Math.min(
+      1,
+      MAX_WIDTH/img.naturalWidth
+    );
 
-        +
 
-        (a.g - b.g) *
-        (a.g - b.g)
+  const width=
+    Math.max(
+      1,
+      Math.round(
+        img.naturalWidth*scale
+      )
+    );
 
-        +
 
-        (a.b - b.b) *
-        (a.b - b.b)
+  const height=
+    Math.max(
+      1,
+      Math.round(
+        img.naturalHeight*scale
+      )
+    );
+
+
+  const canvas=
+    document.createElement("canvas");
+
+
+  canvas.width=width;
+
+  canvas.height=height;
+
+
+  const ctx=
+    canvas.getContext(
+      "2d",
+      {
+        willReadFrequently:true
+      }
+    );
+
+
+  ctx.drawImage(
+    img,
+    0,
+    0,
+    width,
+    height
+  );
+
+
+  return{
+
+    data:
+      ctx.getImageData(
+        0,
+        0,
+        width,
+        height
+      ),
+
+    width,
+
+    height
+
+  };
+
+}
+
+
+/*
+==================================================
+RGB距離
+==================================================
+*/
+
+function colorDistance(a,b){
+
+  return Math.sqrt(
+
+    (a.r-b.r)**2+
+
+    (a.g-b.g)**2+
+
+    (a.b-b.b)**2
+
+  );
+
+}
+
+
+/*
+==================================================
+一番近いゲーム色を探す
+==================================================
+*/
+
+function nearestGameColor(rgb){
+
+  let best=-1;
+
+  let bestD=Infinity;
+
+
+  for(
+    let i=0;
+    i<GAME_COLORS.length;
+    i++
+  ){
+
+    const d=
+      colorDistance(
+        rgb,
+        GAME_COLORS[i]
+      );
+
+
+    if(d<bestD){
+
+      bestD=d;
+
+      best=i;
+
+    }
+
+  }
+
+
+  return{
+
+    index:best,
+
+    distance:bestD
+
+  };
+
+}
+
+
+/*
+==================================================
+10色のカラーマスク作成
+==================================================
+*/
+
+function makeColorMask(image){
+
+  const{
+    data,
+    width,
+    height
+  }=image;
+
+
+  const mask=
+    new Uint8Array(
+      width*height
+    );
+
+
+  for(
+    let i=0;
+    i<width*height;
+    i++
+  ){
+
+    const p=i*4;
+
+
+    const r=data[p];
+
+    const g=data[p+1];
+
+    const b=data[p+2];
+
+    const a=data[p+3];
+
+
+    if(a<80)continue;
+
+
+    const q=
+      nearestGameColor({
+        r,
+        g,
+        b
+      });
+
+
+    if(
+      q.distance<=COLOR_TOLERANCE
+    ){
+
+      mask[i]=1;
+
+    }
+
+  }
+
+
+  return mask;
+
+}
+
+
+/*
+==================================================
+色付き領域を検出
+==================================================
+*/
+
+function findComponents(
+  image,
+  mask
+){
+
+  const{
+    width,
+    height
+  }=image;
+
+
+  const total=
+    width*height;
+
+
+  const visited=
+    new Uint8Array(total);
+
+
+  const queue=
+    new Int32Array(total);
+
+
+  const result=[];
+
+
+  for(
+    let y=0;
+    y<height;
+    y++
+  ){
+
+    for(
+      let x=0;
+      x<width;
+      x++
+    ){
+
+      const start=
+        y*width+x;
+
+
+      if(
+        !mask[start] ||
+        visited[start]
+      ){
+
+        continue;
+
+      }
+
+
+      let head=0;
+
+      let tail=0;
+
+
+      queue[tail++]=start;
+
+      visited[start]=1;
+
+
+      let area=0;
+
+
+      let minX=x;
+
+      let maxX=x;
+
+      let minY=y;
+
+      let maxY=y;
+
+
+      let sumX=0;
+
+      let sumY=0;
+
+
+      const colorCounts=
+        new Array(10).fill(0);
+
+
+      while(head<tail){
+
+        const idx=
+          queue[head++];
+
+
+        const px=
+          idx%width;
+
+
+        const py=
+          Math.floor(
+            idx/width
+          );
+
+
+        const p=
+          idx*4;
+
+
+        area++;
+
+
+        sumX+=px;
+
+        sumY+=py;
+
+
+        minX=
+          Math.min(
+            minX,
+            px
+          );
+
+
+        maxX=
+          Math.max(
+            maxX,
+            px
+          );
+
+
+        minY=
+          Math.min(
+            minY,
+            py
+          );
+
+
+        maxY=
+          Math.max(
+            maxY,
+            py
+          );
+
+
+        const nc=
+          nearestGameColor({
+
+            r:image.data[p],
+
+            g:image.data[p+1],
+
+            b:image.data[p+2]
+
+          });
+
+
+        if(
+          nc.distance<=COLOR_TOLERANCE
+        ){
+
+          colorCounts[
+            nc.index
+          ]++;
+
+        }
+
+
+        if(px>0){
+
+          const n=idx-1;
+
+
+          if(
+            mask[n] &&
+            !visited[n]
+          ){
+
+            visited[n]=1;
+
+            queue[tail++]=n;
+
+          }
+
+        }
+
+
+        if(px<width-1){
+
+          const n=idx+1;
+
+
+          if(
+            mask[n] &&
+            !visited[n]
+          ){
+
+            visited[n]=1;
+
+            queue[tail++]=n;
+
+          }
+
+        }
+
+
+        if(py>0){
+
+          const n=idx-width;
+
+
+          if(
+            mask[n] &&
+            !visited[n]
+          ){
+
+            visited[n]=1;
+
+            queue[tail++]=n;
+
+          }
+
+        }
+
+
+        if(py<height-1){
+
+          const n=idx+width;
+
+
+          if(
+            mask[n] &&
+            !visited[n]
+          ){
+
+            visited[n]=1;
+
+            queue[tail++]=n;
+
+          }
+
+        }
+
+      }
+
+
+      const w=
+        maxX-minX+1;
+
+
+      const h=
+        maxY-minY+1;
+
+
+      if(
+        area>=100 &&
+        w>=8 &&
+        h>=8
+      ){
+
+        let color=0;
+
+
+        for(
+          let i=1;
+          i<10;
+          i++
+        ){
+
+          if(
+            colorCounts[i]>
+            colorCounts[color]
+          ){
+
+            color=i;
+
+          }
+
+        }
+
+
+        result.push({
+
+          area,
+
+          x:
+            (minX+maxX)/2,
+
+          y:
+            (minY+maxY)/2,
+
+          width:w,
+
+          height:h,
+
+          color
+
+        });
+
+      }
+
+    }
+
+  }
+
+
+  return result;
+
+}
+
+
+/*
+==================================================
+中央値
+==================================================
+*/
+
+function median(a){
+
+  if(!a.length)return 0;
+
+
+  const x=
+    a.slice().sort(
+      (p,q)=>p-q
+    );
+
+
+  const m=
+    Math.floor(
+      x.length/2
+    );
+
+
+  return(
+    x.length%2
+      ?x[m]
+      :(x[m-1]+x[m])/2
+  );
+
+}
+
+
+/*
+==================================================
+座標グループ
+==================================================
+*/
+
+function groupPositions(
+  values,
+  tolerance
+){
+
+  const s=
+    values
+      .slice()
+      .sort(
+        (a,b)=>a-b
+      );
+
+
+  const groups=[];
+
+
+  for(
+    const v of s
+  ){
+
+    if(!groups.length){
+
+      groups.push([v]);
+
+      continue;
+
+    }
+
+
+    const g=
+      groups[
+        groups.length-1
+      ];
+
+
+    const center=
+      g.reduce(
+        (a,b)=>a+b,
+        0
+      )/g.length;
+
+
+    if(
+      Math.abs(
+        v-center
+      )<=tolerance
+    ){
+
+      g.push(v);
+
+    }else{
+
+      groups.push([v]);
+
+    }
+
+  }
+
+
+  return groups.map(
+
+    g=>
+      g.reduce(
+        (a,b)=>a+b,
+        0
+      )/g.length
+
+  );
+
+}
+
+
+/*
+==================================================
+規則的なグリッドを選ぶ
+==================================================
+*/
+
+function chooseGrid(groups){
+
+  if(groups.length<4)
+    return null;
+
+
+  let best=null;
+
+
+  for(
+    let start=0;
+    start<groups.length;
+    start++
+  ){
+
+    for(
+      let n=4;
+      n<=20;
+      n++
+    ){
+
+      if(
+        start+n>
+        groups.length
+      ){
+
+        break;
+
+      }
+
+
+      const a=
+        groups.slice(
+          start,
+          start+n
+        );
+
+
+      const diffs=[];
+
+
+      for(
+        let i=1;
+        i<a.length;
+        i++
+      ){
+
+        diffs.push(
+          a[i]-a[i-1]
+        );
+
+      }
+
+
+      const sp=
+        median(diffs);
+
+
+      if(sp<=0)continue;
+
+
+      let err=0;
+
+
+      for(
+        const d of diffs
+      ){
+
+        err+=
+          Math.abs(d-sp)/sp;
+
+      }
+
+
+      err/=diffs.length;
+
+
+      const score=
+        err-
+        (n===10?.15:0);
+
+
+      if(
+        !best ||
+        score<best.score
+      ){
+
+        best={
+
+          score,
+
+          positions:a
+
+        };
+
+      }
+
+    }
+
+  }
+
+
+  return best;
+
+}
+
+
+/*
+==================================================
+盤面検出
+==================================================
+*/
+
+function detectBoard(img){
+
+  const image=
+    makeCanvasImage(img);
+
+
+  const mask=
+    makeColorMask(image);
+
+
+  const components=
+    findComponents(
+      image,
+      mask
+    );
+
+
+  if(
+    components.length<20
+  ){
+
+    throw new Error(
+
+      "色付きの正方形マスを十分に検出できませんでした。"
 
     );
 
+  }
+
+
+  const areas=
+    components.map(
+      c=>c.area
+    );
+
+
+  const medArea=
+    median(areas);
+
+
+  let candidates=
+    components.filter(
+
+      c=>
+        c.area>
+        medArea*0.45 &&
+
+        c.area<
+        medArea*2.0 &&
+
+        c.width/c.height>
+        0.65 &&
+
+        c.width/c.height<
+        1.5
+
+    );
+
+
+  if(
+    candidates.length<20
+  ){
+
+    candidates=
+      components.filter(
+
+        c=>
+          c.width/c.height>
+          0.65 &&
+
+          c.width/c.height<
+          1.5
+
+      );
+
+  }
+
+
+  if(
+    candidates.length<20
+  ){
+
+    throw new Error(
+
+      "盤面の正方形マスを十分に検出できませんでした。"
+
+    );
+
+  }
+
+
+  const medW=
+    median(
+      candidates.map(
+        c=>c.width
+      )
+    );
+
+
+  const medH=
+    median(
+      candidates.map(
+        c=>c.height
+      )
+    );
+
+
+  candidates=
+    candidates.filter(
+
+      c=>
+
+        c.width>
+        medW*.55 &&
+
+        c.width<
+        medW*1.55 &&
+
+        c.height>
+        medH*.55 &&
+
+        c.height<
+        medH*1.55
+
+    );
+
+
+  const xs=
+    groupPositions(
+
+      candidates.map(
+        c=>c.x
+      ),
+
+      Math.max(
+        4,
+        medW*.4
+      )
+
+    );
+
+
+  const ys=
+    groupPositions(
+
+      candidates.map(
+        c=>c.y
+      ),
+
+      Math.max(
+        4,
+        medH*.4
+      )
+
+    );
+
+
+  const gx=
+    chooseGrid(xs);
+
+
+  const gy=
+    chooseGrid(ys);
+
+
+  if(
+    !gx ||
+    !gy
+  ){
+
+    throw new Error(
+
+      "盤面の行・列を検出できませんでした。"
+
+    );
+
+  }
+
+
+  const xPositions=
+    gx.positions.length===10
+      ?gx.positions
+      :findBestTen(xs);
+
+
+  const yPositions=
+    gy.positions.length===10
+      ?gy.positions
+      :findBestTen(ys);
+
+
+  if(
+    xPositions.length!==10 ||
+    yPositions.length!==10
+  ){
+
+    throw new Error(
+
+      `10×10の盤面を認識できませんでした。
+
+候補：
+${yPositions.length}行×${xPositions.length}列`
+
+    );
+
+  }
+
+
+  const colors=[];
+
+
+  const distances=[];
+
+
+  for(
+    let r=0;
+    r<10;
+    r++
+  ){
+
+    for(
+      let c=0;
+      c<10;
+      c++
+    ){
+
+      const x=
+        xPositions[c];
+
+
+      const y=
+        yPositions[r];
+
+
+      const nearest=
+        findCellColor(
+
+          image,
+
+          x,
+
+          y,
+
+          medW,
+
+          medH
+
+        );
+
+
+      if(
+        nearest.distance>
+        COLOR_TOLERANCE
+      ){
+
+        throw new Error(
+
+          `${r+1}行${c+1}列の色を認識できませんでした。`
+
+        );
+
+      }
+
+
+      colors.push(
+        nearest.index
+      );
+
+
+      distances.push(
+        nearest.distance
+      );
+
+    }
+
+  }
+
+
+  return{
+
+    rows:10,
+
+    cols:10,
+
+    colors,
+
+    components:
+      candidates.length,
+
+    distances,
+
+    imageWidth:
+      image.width,
+
+    imageHeight:
+      image.height
+
+  };
+
 }
 
 
+/*
+==================================================
+10個の座標を選択
+==================================================
+*/
 
-/* =====================================================
-   色ピクセル
-===================================================== */
+function findBestTen(groups){
 
-function isColorPixel(
-    r,
-    g,
-    b,
-    a
-) {
-
-    if (a < 50) {
-        return false;
-    }
+  if(groups.length<10)
+    return groups;
 
 
-    const max =
-        Math.max(
-            r,
-            g,
-            b
-        );
+  let best=null;
 
 
-    const min =
-        Math.min(
-            r,
-            g,
-            b
-        );
+  for(
+    let s=0;
+    s+10<=groups.length;
+    s++
+  ){
+
+    const a=
+      groups.slice(
+        s,
+        s+10
+      );
 
 
-    const avg =
-        (
-            r +
-            g +
-            b
-        ) / 3;
+    const diffs=[];
 
 
-    if (
-        avg > 248
-    ) {
+    for(
+      let i=1;
+      i<a.length;
+      i++
+    ){
 
-        return false;
+      diffs.push(
+        a[i]-a[i-1]
+      );
 
     }
 
 
-    if (
-        max - min < 15
-    ) {
+    const sp=
+      median(diffs);
+
+
+    let err=0;
+
+
+    for(
+      const d of diffs
+    ){
+
+      err+=
+        Math.abs(d-sp)/sp;
+
+    }
+
+
+    err/=diffs.length;
+
+
+    if(
+      !best ||
+      err<best.err
+    ){
+
+      best={
+        a,
+        err
+      };
+
+    }
+
+  }
+
+
+  return best.a;
+
+}
+
+
+/*
+==================================================
+各マスの色を読み取る
+==================================================
+*/
+
+function findCellColor(
+  image,
+  cx,
+  cy,
+  w,
+  h
+){
+
+  const{
+    data,
+    width,
+    height
+  }=image;
+
+
+  /*
+  マス中央付近だけを調べます。
+
+  境界線や白い隙間を避けるため、
+  マス全体ではなく中央18%程度を使います。
+  */
+
+  const rx=
+    Math.max(
+      2,
+      Math.floor(w*.18)
+    );
+
+
+  const ry=
+    Math.max(
+      2,
+      Math.floor(h*.18)
+    );
+
+
+  const samples=[];
+
+
+  for(
+    let y=
+      Math.round(cy)-ry;
+
+    y<=
+      Math.round(cy)+ry;
+
+    y++
+  ){
+
+    if(
+      y<0 ||
+      y>=height
+    )continue;
+
+
+    for(
+      let x=
+        Math.round(cx)-rx;
+
+      x<=
+        Math.round(cx)+rx;
+
+      x++
+    ){
+
+      if(
+        x<0 ||
+        x>=width
+      )continue;
+
+
+      const p=
+        (y*width+x)*4;
+
+
+      samples.push({
+
+        r:data[p],
+
+        g:data[p+1],
+
+        b:data[p+2]
+
+      });
+
+    }
+
+  }
+
+
+  if(!samples.length){
+
+    return{
+
+      index:-1,
+
+      distance:Infinity
+
+    };
+
+  }
+
+
+  /*
+  中央部分のRGB中央値を取得します。
+  */
+
+  const rgb={
+
+    r:
+      median(
+        samples.map(
+          s=>s.r
+        )
+      ),
+
+    g:
+      median(
+        samples.map(
+          s=>s.g
+        )
+      ),
+
+    b:
+      median(
+        samples.map(
+          s=>s.b
+        )
+      )
+
+  };
+
+
+  return nearestGameColor(rgb);
+
+}
+
+
+/*
+==================================================
+パズルを解く
+==================================================
+*/
+
+function solvePuzzle(
+  colors,
+  rows,
+  cols
+){
+
+  const colorCount=10;
+
+
+  const positions=
+    Array.from(
+      {
+        length:10
+      },
+      ()=>[]
+    );
+
+
+  for(
+    let r=0;
+    r<rows;
+    r++
+  ){
+
+    for(
+      let c=0;
+      c<cols;
+      c++
+    ){
+
+      positions[
+        colors[
+          r*cols+c
+        ]
+      ].push([
+        r,
+        c
+      ]);
+
+    }
+
+  }
+
+
+  for(
+    const p of positions
+  ){
+
+    if(!p.length)
+      return null;
+
+  }
+
+
+  const placed=
+    new Array(10)
+      .fill(null);
+
+
+  const usedRows=
+    new Uint8Array(rows);
+
+
+  const usedCols=
+    new Uint8Array(cols);
+
+
+  function canPlace(r,c){
+
+    if(
+      usedRows[r] ||
+      usedCols[c]
+    ){
+
+      return false;
+
+    }
+
+
+    for(
+      const p of placed
+    ){
+
+      if(!p)continue;
+
+
+      /*
+      縦・横・斜めの隣接を禁止
+      */
+
+      if(
+
+        Math.abs(
+          p[0]-r
+        )<=1 &&
+
+        Math.abs(
+          p[1]-c
+        )<=1
+
+      ){
 
         return false;
+
+      }
 
     }
 
 
     return true;
 
-}
+  }
 
 
+  function search(done){
 
-/* =====================================================
-   連結成分
-===================================================== */
+    if(done===10){
 
-function findComponents(
-    imageData,
-    width,
-    height
-) {
-
-    const data =
-        imageData.data;
-
-
-    const total =
-        width * height;
-
-
-    const mask =
-        new Uint8Array(
-            total
-        );
-
-
-    for (
-        let i = 0;
-        i < total;
-        i++
-    ) {
-
-        const p =
-            i * 4;
-
-
-        if (
-            isColorPixel(
-                data[p],
-                data[p + 1],
-                data[p + 2],
-                data[p + 3]
-            )
-        ) {
-
-            mask[i] = 1;
-
-        }
+      return placed.map(
+        p=>[
+          p[0],
+          p[1]
+        ]
+      );
 
     }
 
 
-    const visited =
-        new Uint8Array(
-            total
-        );
+    let bestColor=-1;
 
+    let bestCandidates=null;
 
-    const queue =
-        new Int32Array(
-            total
-        );
 
+    /*
+    現在置ける場所が最も少ない色から
+    調べることで高速化します。
+    */
 
-    const result = [];
+    for(
+      let color=0;
+      color<10;
+      color++
+    ){
 
+      if(
+        placed[color]
+      )continue;
 
-    for (
-        let y = 0;
-        y < height;
-        y++
-    ) {
 
-        for (
-            let x = 0;
-            x < width;
-            x++
-        ) {
+      const candidates=
+        positions[color]
+          .filter(
+            p=>
+              canPlace(
+                p[0],
+                p[1]
+              )
+          );
 
-            const start =
-                y * width + x;
 
-
-            if (
-                !mask[start] ||
-                visited[start]
-            ) {
-
-                continue;
-
-            }
-
-
-            let head = 0;
-
-            let tail = 0;
-
-
-            queue[tail++] =
-                start;
-
-
-            visited[start] =
-                1;
-
-
-            let area = 0;
-
-            let minX = x;
-
-            let maxX = x;
-
-            let minY = y;
-
-            let maxY = y;
-
-
-            let sumX = 0;
-
-            let sumY = 0;
-
-
-            while (
-                head < tail
-            ) {
-
-                const index =
-                    queue[head++];
-
-
-                const px =
-                    index % width;
-
-
-                const py =
-                    Math.floor(
-                        index / width
-                    );
-
-
-                area++;
-
-                sumX += px;
-
-                sumY += py;
-
-
-                minX =
-                    Math.min(
-                        minX,
-                        px
-                    );
-
-                maxX =
-                    Math.max(
-                        maxX,
-                        px
-                    );
-
-                minY =
-                    Math.min(
-                        minY,
-                        py
-                    );
-
-                maxY =
-                    Math.max(
-                        maxY,
-                        py
-                    );
-
-
-                const neighbors = [];
-
-
-                if (px > 0)
-                    neighbors.push(
-                        index - 1
-                    );
-
-
-                if (
-                    px <
-                    width - 1
-                )
-                    neighbors.push(
-                        index + 1
-                    );
-
-
-                if (py > 0)
-                    neighbors.push(
-                        index - width
-                    );
-
-
-                if (
-                    py <
-                    height - 1
-                )
-                    neighbors.push(
-                        index + width
-                    );
-
-
-                for (
-                    const n
-                    of neighbors
-                ) {
-
-                    if (
-                        mask[n] &&
-                        !visited[n]
-                    ) {
-
-                        visited[n] = 1;
-
-                        queue[
-                            tail++
-                        ] = n;
-
-                    }
-
-                }
-
-            }
-
-
-            const w =
-                maxX - minX + 1;
-
-
-            const h =
-                maxY - minY + 1;
-
-
-            const ratio =
-                w / h;
-
-
-            if (
-
-                area >= 80
-
-                &&
-
-                w >= 8
-
-                &&
-
-                h >= 8
-
-                &&
-
-                ratio >= .70
-
-                &&
-
-                ratio <= 1.43
-
-            ) {
-
-                result.push({
-
-                    area,
-
-                    x:
-                        (
-                            minX +
-                            maxX
-                        ) / 2,
-
-                    y:
-                        (
-                            minY +
-                            maxY
-                        ) / 2,
-
-                    width: w,
-
-                    height: h
-
-                });
-
-            }
-
-        }
-
-    }
-
-
-    return result;
-
-}
-
-
-
-/* =====================================================
-   中央値
-===================================================== */
-
-function median(
-    arr
-) {
-
-    if (
-        arr.length === 0
-    ) {
-
-        return 0;
-
-    }
-
-
-    const a =
-        arr
-            .slice()
-            .sort(
-                (x,y) =>
-                    x-y
-            );
-
-
-    const m =
-        Math.floor(
-            a.length / 2
-        );
-
-
-    if (
-        a.length % 2
-    ) {
-
-        return a[m];
-
-    }
-
-
-    return (
-        a[m-1] +
-        a[m]
-    ) / 2;
-
-}
-
-
-
-/* =====================================================
-   座標をまとめる
-===================================================== */
-
-function groupPositions(
-    values,
-    tolerance
-) {
-
-    const sorted =
-        values
-            .slice()
-            .sort(
-                (a,b) =>
-                    a-b
-            );
-
-
-    const groups = [];
-
-
-    for (
-        const v
-        of sorted
-    ) {
-
-        if (
-            groups.length === 0
-        ) {
-
-            groups.push(
-                [v]
-            );
-
-            continue;
-
-        }
-
-
-        const g =
-            groups[
-                groups.length - 1
-            ];
-
-
-        const center =
-            g.reduce(
-                (s,x) =>
-                    s+x,
-                0
-            ) /
-            g.length;
-
-
-        if (
-            Math.abs(
-                v-center
-            ) <=
-            tolerance
-        ) {
-
-            g.push(v);
-
-        }
-        else {
-
-            groups.push(
-                [v]
-            );
-
-        }
-
-    }
-
-
-    return groups.map(
-        g =>
-            g.reduce(
-                (s,x) =>
-                    s+x,
-                0
-            ) /
-            g.length
-    );
-
-}
-
-
-
-/* =====================================================
-   規則的なグリッド
-===================================================== */
-
-function chooseGrid(
-    groups
-) {
-
-    if (
-        groups.length < 4
-    ) {
+      if(
+        !candidates.length
+      ){
 
         return null;
 
-    }
+      }
 
 
-    let best = null;
+      if(
 
+        !bestCandidates ||
 
-    /*
-     * 可能な範囲を全部調べる
-     */
+        candidates.length<
+        bestCandidates.length
 
-    for (
-        let start = 0;
-        start <
-        groups.length;
-        start++
-    ) {
+      ){
 
-        for (
-            let count = 4;
-            count <= 20;
-            count++
-        ) {
+        bestColor=color;
 
-            const end =
-                start + count;
+        bestCandidates=
+          candidates;
 
-
-            if (
-                end >
-                groups.length
-            ) {
-
-                break;
-
-            }
-
-
-            const arr =
-                groups.slice(
-                    start,
-                    end
-                );
-
-
-            const diffs = [];
-
-
-            for (
-                let i = 1;
-                i < arr.length;
-                i++
-            ) {
-
-                diffs.push(
-                    arr[i] -
-                    arr[i-1]
-                );
-
-            }
-
-
-            const spacing =
-                median(
-                    diffs
-                );
-
-
-            if (
-                spacing <= 0
-            ) {
-
-                continue;
-
-            }
-
-
-            let error = 0;
-
-
-            for (
-                const d
-                of diffs
-            ) {
-
-                error +=
-                    Math.abs(
-                        d-spacing
-                    ) /
-                    spacing;
-
-            }
-
-
-            error /=
-                diffs.length;
-
-
-            /*
-             * 正方形マスなので
-             * 多少の誤差を許す
-             */
-
-            const score =
-                error -
-                count * .02;
-
-
-            if (
-                !best ||
-                score < best.score
-            ) {
-
-                best = {
-
-                    score,
-
-                    positions:
-                        arr
-
-                };
-
-            }
-
-        }
+      }
 
     }
 
 
-    return best;
+    for(
+      const p of bestCandidates
+    ){
+
+      const r=p[0];
+
+      const c=p[1];
+
+
+      placed[bestColor]=p;
+
+      usedRows[r]=1;
+
+      usedCols[c]=1;
+
+
+      const result=
+        search(done+1);
+
+
+      if(result)
+        return result;
+
+
+      placed[bestColor]=null;
+
+      usedRows[r]=0;
+
+      usedCols[c]=0;
+
+    }
+
+
+    return null;
+
+  }
+
+
+  return search(0);
 
 }
 
 
-
-/* =====================================================
-   中央色
-===================================================== */
-
-function sampleColor(
-    data,
-    width,
-    height,
-    x,
-    y,
-    cellW,
-    cellH
-) {
-
-    /*
-     * 中央の40%だけを読む。
-     */
-
-    const rx =
-        Math.max(
-            2,
-            Math.floor(
-                cellW * .18
-            )
-        );
-
-
-    const ry =
-        Math.max(
-            2,
-            Math.floor(
-                cellH * .18
-            )
-        );
-
-
-    const colors = [];
-
-
-    for (
-        let yy =
-            Math.round(y)-ry;
-
-        yy <=
-            Math.round(y)+ry;
-
-        yy++
-    ) {
-
-        if (
-            yy < 0 ||
-            yy >= height
-        ) {
-
-            continue;
-
-        }
-
-
-        for (
-            let xx =
-                Math.round(x)-rx;
-
-            xx <=
-                Math.round(x)+rx;
-
-            xx++
-        ) {
-
-            if (
-                xx < 0 ||
-                xx >= width
-            ) {
-
-                continue;
-
-            }
-
-
-            const p =
-                (
-                    yy *
-                    width +
-                    xx
-                ) * 4;
-
-
-            const r =
-                data[p];
-
-            const g =
-                data[p+1];
-
-            const b =
-                data[p+2];
-
-            const a =
-                data[p+3];
-
-
-            if (
-                isColorPixel(
-                    r,
-                    g,
-                    b,
-                    a
-                )
-            ) {
-
-                colors.push(
-                    {
-                        r,
-                        g,
-                        b
-                    }
-                );
-
-            }
-
-        }
-
-    }
-
-
-    if (
-        colors.length === 0
-    ) {
-
-        return null;
-
-    }
-
-
-    return {
-
-        r:
-            median(
-                colors.map(
-                    c => c.r
-                )
-            ),
-
-        g:
-            median(
-                colors.map(
-                    c => c.g
-                )
-            ),
-
-        b:
-            median(
-                colors.map(
-                    c => c.b
-                )
-            )
-
-    };
-
-}
-
-
-
-/* =====================================================
-   盤面検出
-===================================================== */
-
-function detectBoard(
-    img
-) {
-
-    const image =
-        makeCanvasImage(
-            img
-        );
-
-
-    const components =
-        findComponents(
-            image.data,
-            image.width,
-            image.height
-        );
-
-
-    if (
-        components.length < 16
-    ) {
-
-        throw new Error(
-            "色付きマスを十分に検出できませんでした。"
-        );
-
-    }
-
-
-    /*
-     * 面積を大きい順
-     */
-
-    const sorted =
-        components
-            .slice()
-            .sort(
-                (a,b) =>
-                    b.area-a.area
-            );
-
-
-    /*
-     * 実際の盤面マスは
-     * 同じ大きさなので、
-     * 最大面積付近だけ使う。
-     */
-
-    const maxArea =
-        sorted[0].area;
-
-
-    const candidates =
-        sorted.filter(
-            c =>
-                c.area >=
-                maxArea * .50
-        );
-
-
-    if (
-        candidates.length < 16
-    ) {
-
-        throw new Error(
-            "盤面の正方形マスを十分に見つけられませんでした。"
-        );
-
-    }
-
-
-    const cellW =
-        median(
-            candidates.map(
-                c => c.width
-            )
-        );
-
-
-    const cellH =
-        median(
-            candidates.map(
-                c => c.height
-            )
-        );
-
-
-    /*
-     * X/Yをまとめる
-     */
-
-    const xs =
-        groupPositions(
-            candidates.map(
-                c => c.x
-            ),
-            Math.max(
-                5,
-                cellW * .35
-            )
-        );
-
-
-    const ys =
-        groupPositions(
-            candidates.map(
-                c => c.y
-            ),
-            Math.max(
-                5,
-                cellH * .35
-            )
-        );
-
-
-    const gridX =
-        chooseGrid(
-            xs
-        );
-
-
-    const gridY =
-        chooseGrid(
-            ys
-        );
-
-
-    if (
-        !gridX ||
-        !gridY
-    ) {
-
-        throw new Error(
-            "盤面の行と列を検出できませんでした。"
-        );
-
-    }
-
-
-    const xPositions =
-        gridX.positions;
-
-
-    const yPositions =
-        gridY.positions;
-
-
-    const cols =
-        xPositions.length;
-
-
-    const rows =
-        yPositions.length;
-
-
-    if (
-        rows !== cols
-    ) {
-
-        throw new Error(
-            `盤面が${rows}×${cols}として検出されました。\n` +
-            "このゲームでは正方形の盤面を想定しています。"
-        );
-
-    }
-
-
-    /*
-     * 各マスの中央色
-     */
-
-    const colors = [];
-
-
-    for (
-        let r=0;
-        r<rows;
-        r++
-    ) {
-
-        for (
-            let c=0;
-            c<cols;
-            c++
-        ) {
-
-            const color =
-                sampleColor(
-                    image.data,
-                    image.width,
-                    image.height,
-                    xPositions[c],
-                    yPositions[r],
-                    cellW,
-                    cellH
-                );
-
-
-            if (!color) {
-
-                throw new Error(
-                    `${r+1}行${c+1}列の色を読み取れませんでした。`
-                );
-
-            }
-
-
-            colors.push(
-                color
-            );
-
-        }
-
-    }
-
-
-    /*
-     * 色認識
-     */
-
-    const normalized =
-        normalizeBoardColors(
-            colors,
-            rows,
-            cols
-        );
-
-
-    return {
-
-        rows,
-
-        cols,
-
-        colors:
-            normalized.colors,
-
-        colorCount:
-            normalized.colorCount,
-
-        rawColors:
-            colors,
-
-        imageWidth:
-            image.width,
-
-        imageHeight:
-            image.height
-
-    };
-
-}
-
-
-
-/* =====================================================
-   色認識
-===================================================== */
-
-function normalizeBoardColors(
-    samples,
-    rows,
-    cols
-) {
-
-    /*
-     * このゲームでは
-     *
-     * 10×10 → 10色
-     *
-     * 20×20 → 20色
-     *
-     * とする。
-     */
-
-    const expected =
-        Math.min(
-            rows,
-            cols
-        );
-
-
-    /*
-     * まず遠い色から
-     * 色の代表値を選ぶ。
-     */
-
-    const centers = [];
-
-
-    /*
-     * 最初
-     */
-
-    centers.push(
-        samples[0]
-    );
-
-
-    while (
-        centers.length <
-        expected
-    ) {
-
-        let best =
-            null;
-
-        let bestDistance =
-            -1;
-
-
-        for (
-            const s
-            of samples
-        ) {
-
-            let nearest =
-                Infinity;
-
-
-            for (
-                const c
-                of centers
-            ) {
-
-                nearest =
-                    Math.min(
-                        nearest,
-                        rgbDistance(
-                            s,
-                            c
-                        )
-                    );
-
-            }
-
-
-            if (
-                nearest >
-                bestDistance
-            ) {
-
-                bestDistance =
-                    nearest;
-
-                best =
-                    s;
-
-            }
-
-        }
-
-
-        if (!best) {
-            break;
-        }
-
-
-        centers.push(
-            best
-        );
-
-    }
-
-
-    /*
-     * K-means
-     */
-
-    let labels =
-        new Array(
-            samples.length
-        ).fill(0);
-
-
-    for (
-        let iteration=0;
-        iteration<50;
-        iteration++
-    ) {
-
-        /*
-         * 各マスを最も近い色へ
-         */
-
-        for (
-            let i=0;
-            i<samples.length;
-            i++
-        ) {
-
-            let best=0;
-
-            let bestD=
-                Infinity;
-
-
-            for (
-                let c=0;
-                c<centers.length;
-                c++
-            ) {
-
-                const d =
-                    rgbDistance(
-                        samples[i],
-                        centers[c]
-                    );
-
-
-                if (
-                    d<bestD
-                ) {
-
-                    bestD=d;
-
-                    best=c;
-
-                }
-
-            }
-
-
-            labels[i]=best;
-
-        }
-
-
-        /*
-         * 中心を計算
-         */
-
-        const sum =
-            centers.map(
-                () => ({
-                    r:0,
-                    g:0,
-                    b:0,
-                    n:0
-                })
-            );
-
-
-        for (
-            let i=0;
-            i<samples.length;
-            i++
-        ) {
-
-            const c =
-                labels[i];
-
-
-            sum[c].r +=
-                samples[i].r;
-
-            sum[c].g +=
-                samples[i].g;
-
-            sum[c].b +=
-                samples[i].b;
-
-            sum[c].n++;
-
-        }
-
-
-        for (
-            let c=0;
-            c<centers.length;
-            c++
-        ) {
-
-            /*
-             * 空の色ができた場合、
-             * 一番遠いマスを代表色にする。
-             */
-
-            if (
-                sum[c].n === 0
-            ) {
-
-                let farthest =
-                    0;
-
-                let farthestD =
-                    -1;
-
-
-                for (
-                    let i=0;
-                    i<samples.length;
-                    i++
-                ) {
-
-                    const d =
-                        rgbDistance(
-                            samples[i],
-                            centers[
-                                labels[i]
-                            ]
-                        );
-
-
-                    if (
-                        d >
-                        farthestD
-                    ) {
-
-                        farthestD=d;
-
-                        farthest=i;
-
-                    }
-
-                }
-
-
-                centers[c] =
-                    samples[
-                        farthest
-                    ];
-
-
-                continue;
-
-            }
-
-
-            centers[c] = {
-
-                r:
-                    sum[c].r /
-                    sum[c].n,
-
-                g:
-                    sum[c].g /
-                    sum[c].n,
-
-                b:
-                    sum[c].b /
-                    sum[c].n
-
-            };
-
-        }
-
-    }
-
-
-    /*
-     * 色番号を整理
-     */
-
-    const used =
-        new Set(
-            labels
-        );
-
-
-    /*
-     * もし10色全部使われていなければ
-     * 色認識を補正。
-     */
-
-    if (
-        used.size <
-        expected
-    ) {
-
-        /*
-         * 各マスを色中心から分類し直す。
-         */
-
-        labels =
-            samples.map(
-                sample => {
-
-                    let best=0;
-
-                    let bestD=
-                        Infinity;
-
-
-                    for (
-                        let c=0;
-                        c<centers.length;
-                        c++
-                    ) {
-
-                        const d =
-                            rgbDistance(
-                                sample,
-                                centers[c]
-                            );
-
-
-                        if (
-                            d<bestD
-                        ) {
-
-                            bestD=d;
-
-                            best=c;
-
-                        }
-
-                    }
-
-
-                    return best;
-
-                }
-            );
-
-    }
-
-
-    /*
-     * 使われている色を
-     * 0,1,2,3...
-     * に詰める
-     */
-
-    const map =
-        new Map();
-
-
-    let next=0;
-
-
-    const normalized =
-        labels.map(
-            label => {
-
-                if (
-                    !map.has(label)
-                ) {
-
-                    map.set(
-                        label,
-                        next++
-                    );
-
-                }
-
-
-                return map.get(
-                    label
-                );
-
-            }
-        );
-
-
-    return {
-
-        colors:
-            normalized,
-
-        colorCount:
-            next
-
-    };
-
-}
-
-
-
-/* =====================================================
-   パズル解答
-===================================================== */
-
-function solvePuzzle(
-    colors,
-    rows,
-    cols
-) {
-
-    const colorCount =
-        Math.max(
-            ...colors
-        ) + 1;
-
-
-    /*
-     * 色数が盤面サイズと一致しないなら
-     * この色認識は使えない。
-     */
-
-    if (
-        colorCount !== rows
-    ) {
-
-        return null;
-
-    }
-
-
-    /*
-     * 各色の候補
-     */
-
-    const positions =
-        Array.from(
-            {
-                length:
-                    colorCount
-            },
-            () => []
-        );
-
-
-    for (
-        let r=0;
-        r<rows;
-        r++
-    ) {
-
-        for (
-            let c=0;
-            c<cols;
-            c++
-        ) {
-
-            const color =
-                colors[
-                    r*cols+c
-                ];
-
-
-            positions[color].push(
-                [r,c]
-            );
-
-        }
-
-    }
-
-
-    /*
-     * それぞれの色が
-     * 少なくとも1マス必要
-     */
-
-    for (
-        let color=0;
-        color<colorCount;
-        color++
-    ) {
-
-        if (
-            positions[color].length === 0
-        ) {
-
-            return null;
-
-        }
-
-    }
-
-
-    const placed =
-        new Array(
-            colorCount
-        ).fill(null);
-
-
-    const usedRows =
-        new Uint8Array(
-            rows
-        );
-
-
-    const usedCols =
-        new Uint8Array(
-            cols
-        );
-
-
-    /*
-     * 猫を置けるか
-     */
-
-    function canPlace(
-        r,
-        c
-    ) {
-
-        if (
-            usedRows[r]
-        ) {
-
-            return false;
-
-        }
-
-
-        if (
-            usedCols[c]
-        ) {
-
-            return false;
-
-        }
-
-
-        for (
-            const p
-            of placed
-        ) {
-
-            if (!p) {
-                continue;
-            }
-
-
-            const dr =
-                Math.abs(
-                    p[0]-r
-                );
-
-
-            const dc =
-                Math.abs(
-                    p[1]-c
-                );
-
-
-            /*
-             * 8方向隣接禁止
-             */
-
-            if (
-                dr<=1 &&
-                dc<=1
-            ) {
-
-                return false;
-
-            }
-
-        }
-
-
-        return true;
-
-    }
-
-
-
-    /*
-     * 候補
-     */
-
-    function getCandidates(
-        color
-    ) {
-
-        const list=[];
-
-
-        for (
-            const p
-            of positions[color]
-        ) {
-
-            if (
-                canPlace(
-                    p[0],
-                    p[1]
-                )
-            ) {
-
-                list.push(
-                    p
-                );
-
-            }
-
-        }
-
-
-        return list;
-
-    }
-
-
-
-    let nodeCount=0;
-
-    const NODE_LIMIT =
-        10000000;
-
-
-
-    function search(
-        count
-    ) {
-
-        nodeCount++;
-
-
-        if (
-            nodeCount >
-            NODE_LIMIT
-        ) {
-
-            return null;
-
-        }
-
-
-        if (
-            count ===
-            colorCount
-        ) {
-
-            return placed.map(
-                p =>
-                    [
-                        p[0],
-                        p[1]
-                    ]
-            );
-
-        }
-
-
-        /*
-         * 候補最少の色を選択
-         */
-
-        let bestColor=-1;
-
-        let bestCandidates=null;
-
-
-        for (
-            let color=0;
-            color<colorCount;
-            color++
-        ) {
-
-            if (
-                placed[color]
-            ) {
-
-                continue;
-
-            }
-
-
-            const candidates =
-                getCandidates(
-                    color
-                );
-
-
-            if (
-                candidates.length===0
-            ) {
-
-                return null;
-
-            }
-
-
-            if (
-                bestCandidates===null ||
-
-                candidates.length <
-                bestCandidates.length
-            ) {
-
-                bestColor=color;
-
-                bestCandidates=
-                    candidates;
-
-            }
-
-        }
-
-
-        /*
-         * 候補を試す
-         */
-
-        for (
-            const p
-            of bestCandidates
-        ) {
-
-            const r=p[0];
-
-            const c=p[1];
-
-
-            placed[bestColor]=p;
-
-            usedRows[r]=1;
-
-            usedCols[c]=1;
-
-
-            const result =
-                search(
-                    count+1
-                );
-
-
-            if (result) {
-
-                return result;
-
-            }
-
-
-            placed[bestColor]=null;
-
-            usedRows[r]=0;
-
-            usedCols[c]=0;
-
-        }
-
-
-        return null;
-
-    }
-
-
-    return search(0);
-
-}
-
-
-
-/* =====================================================
-   結果表示
-===================================================== */
+/*
+==================================================
+結果表示
+==================================================
+*/
 
 function drawResult(
-    colors,
-    rows,
-    cols,
-    solution
-) {
+  colors,
+  rows,
+  cols,
+  solution
+){
 
-    resultGrid.innerHTML =
-        "";
+  resultGrid.innerHTML="";
 
-
-    legend.innerHTML =
-        "";
+  legend.innerHTML="";
 
 
-    resultGrid.style.gridTemplateColumns =
-        `repeat(${cols},45px)`;
+  resultGrid.style.gridTemplateColumns=
+    `repeat(${cols},42px)`;
 
 
-    const cats =
-        new Set();
+  const cats=
+    new Set();
 
 
-    if (solution) {
+  if(solution){
 
-        for (
-            const p
-            of solution
-        ) {
+    for(
+      const p of solution
+    ){
 
-            cats.add(
-                `${p[0]},${p[1]}`
-            );
-
-        }
+      cats.add(
+        `${p[0]},${p[1]}`
+      );
 
     }
 
-
-    const colorCount =
-        Math.max(
-            ...colors
-        )+1;
+  }
 
 
-    for (
-        let r=0;
-        r<rows;
-        r++
-    ) {
+  for(
+    let r=0;
+    r<rows;
+    r++
+  ){
 
-        for (
-            let c=0;
-            c<cols;
-            c++
-        ) {
+    for(
+      let c=0;
+      c<cols;
+      c++
+    ){
 
-            const cell =
-                document.createElement(
-                    "div"
-                );
-
-
-            cell.className =
-                "gridCell";
-
-
-            const id =
-                colors[
-                    r*cols+c
-                ];
-
-
-            cell.style.background =
-                paletteColor(
-                    id,
-                    colorCount
-                );
-
-
-            if (
-                cats.has(
-                    `${r},${c}`
-                )
-            ) {
-
-                cell.classList.add(
-                    "cat"
-                );
-
-
-                cell.textContent =
-                    "🐱";
-
-            }
-
-
-            cell.title =
-                `${r+1}行${c+1}列`;
-
-
-            resultGrid.appendChild(
-                cell
-            );
-
-        }
-
-    }
-
-
-    for (
-        let i=0;
-        i<colorCount;
-        i++
-    ) {
-
-        const item =
-            document.createElement(
-                "div"
-            );
-
-
-        item.className =
-            "legendItem";
-
-
-        item.textContent =
-            `色${i+1}`;
-
-
-        item.style.background =
-            paletteColor(
-                i,
-                colorCount
-            );
-
-
-        legend.appendChild(
-            item
+      const cell=
+        document.createElement(
+          "div"
         );
 
+
+      cell.className=
+        "gridCell";
+
+
+      const id=
+        colors[
+          r*cols+c
+        ];
+
+
+      cell.style.background=
+        `rgb(
+          ${GAME_COLORS[id].r},
+          ${GAME_COLORS[id].g},
+          ${GAME_COLORS[id].b}
+        )`;
+
+
+      if(
+        cats.has(
+          `${r},${c}`
+        )
+      ){
+
+        cell.classList.add(
+          "cat"
+        );
+
+
+        cell.textContent="🐱";
+
+      }
+
+
+      cell.title=
+        `${r+1}行${c+1}列 / ${GAME_COLORS[id].name}`;
+
+
+      resultGrid.appendChild(
+        cell
+      );
+
     }
 
+  }
+
+
+  /*
+  色の凡例
+  */
+
+  for(
+    let i=0;
+    i<10;
+    i++
+  ){
+
+    const item=
+      document.createElement(
+        "div"
+      );
+
+
+    item.className=
+      "legendItem";
+
+
+    item.textContent=
+      GAME_COLORS[i].name;
+
+
+    item.style.background=
+      `rgb(
+        ${GAME_COLORS[i].r},
+        ${GAME_COLORS[i].g},
+        ${GAME_COLORS[i].b}
+      )`;
+
+
+    legend.appendChild(
+      item
+    );
+
+  }
+
 }
 
 
+/*
+==================================================
+デバッグ情報
+==================================================
+*/
 
-/* =====================================================
-   表示色
-===================================================== */
+function showDebug(board){
 
-function paletteColor(
-    id,
-    count
-) {
-
-    const hue =
-        (
-            id*360/count
-        )%360;
+  debugBox.style.display=
+    "block";
 
 
-    return `
-        hsl(
-            ${hue},
-            68%,
-            76%
-        )
-    `;
-
-}
+  const counts=
+    new Array(10)
+      .fill(0);
 
 
+  for(
+    const c of board.colors
+  ){
 
-/* =====================================================
-   デバッグ情報
-===================================================== */
+    counts[c]++;
 
-function showDebug(
-    board
-) {
-
-    debugBox.style.display =
-        "block";
+  }
 
 
-    debugBox.textContent =
+  debugBox.textContent=
 
-        "画像サイズ：" +
-        board.imageWidth +
-        " × " +
-        board.imageHeight +
+    `画像：
+${board.imageWidth}×${board.imageHeight}
 
-        "\n" +
+盤面：
+${board.rows}×${board.cols}
 
-        "盤面：" +
-        board.rows +
-        " × " +
-        board.cols +
+検出マス候補：
+${board.components}
 
-        "\n" +
+認識色数：
+${new Set(board.colors).size}
 
-        "認識色数：" +
-        board.colorCount +
+色の使用数：
 
-        "\n\n" +
+`+
 
-        "各マスの色RGB：" +
+    GAME_COLORS
+      .map(
 
-        "\n" +
+        (c,i)=>
+          `${i+1}. ${c.name} rgb(${c.r},${c.g},${c.b}) → ${counts[i]}マス`
 
-        board.rawColors
-            .map(
-                (c,i) =>
-                    `${i+1}: rgb(${Math.round(c.r)},${Math.round(c.g)},${Math.round(c.b)})`
-            )
-            .join("\n");
+      )
+      .join("\n");
 
 }
 
 </script>
 
 </body>
-
 </html>
