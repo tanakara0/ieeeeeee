@@ -1234,6 +1234,25 @@ function createGameColorMask(image){
 
 }
 
+/* =========================================================
+   色付き正方形マスを検出
+   ========================================================= */
+function detectColeredSquares(image){
+    /*
+    まずゲームに使われている色だけをカラーマスクにします。:/
+const mask =
+        createGameColorMask(
+            image
+        );
+
+/* 色がつながっている部分を連結部分として取得します。*/
+    const components = findComponents(
+        mask,
+        image.width
+        image.height
+    );
+    return components;
+}
 
 /* =========================================================
    連結成分検出
