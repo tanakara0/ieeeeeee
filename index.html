@@ -653,39 +653,75 @@ function detectColorBounds(imageData, maskInfo) {
     const { width, height } = imageData;
     const mask = maskInfo.mask;
 
+    /*
+        ----------------------------------------
+        盤面候補を探す
+        ----------------------------------------
+        
+        今まで：
+        「色がある範囲」をそのまま盤面にしていた
+
+        今回：
+        「色が連続して存在している範囲」を調べ、
+        盤面らしい範囲を優先する
+    */
+
     const rowCounts = new Uint32Array(height);
     const colCounts = new Uint32Array(width);
 
     for (let y = 0; y < height; y++) {
 
+        let count = 0;
+
         for (let x = 0; x < width; x++) {
 
             if (mask[y * width + x]) {
-
-                rowCounts[y]++;
-                colCounts[x]++;
-
+                count++;
             }
 
         }
 
+        rowCounts[y] = count;
+    }
+
+
+    for (let x = 0; x < width; x++) {
+
+        let count = 0;
+
+        for (let y = 0; y < height; y++) {
+
+            if (mask[y * width + x]) {
+                count++;
+            }
+
+        }
+
+        colCounts[x] = count;
     }
 
 
     /*
-        最大値
+        ----------------------------------------
+        最大値を取得
+        ----------------------------------------
     */
 
     let maxRow = 0;
     let maxCol = 0;
 
     for (let y = 0; y < height; y++) {
-        maxRow = Math.max(maxRow, rowCounts[y]);
+        if (rowCounts[y] > maxRow) {
+            maxRow = rowCounts[y];
+        }
     }
 
     for (let x = 0; x < width; x++) {
-        maxCol = Math.max(maxCol, colCounts[x]);
+        if (colCounts[x] > maxCol) {
+            maxCol = colCounts[x];
+        }
     }
+
 
     if (maxRow === 0 || maxCol === 0) {
         return null;
@@ -693,17 +729,23 @@ function detectColorBounds(imageData, maskInfo) {
 
 
     /*
+        ----------------------------------------
         盤面らしい行・列を探す
+        ----------------------------------------
+        
+        画面全体に少しだけ色がある場所ではなく、
+        横方向・縦方向の両方に十分な色が
+        集まっている場所を候補にする。
     */
 
     const rowThreshold = Math.max(
-        3,
-        maxRow * 0.18
+        5,
+        Math.floor(maxRow * 0.35)
     );
 
     const colThreshold = Math.max(
-        3,
-        maxCol * 0.18
+        5,
+        Math.floor(maxCol * 0.35)
     );
 
 
@@ -718,11 +760,12 @@ function detectColorBounds(imageData, maskInfo) {
 
         if (rowCounts[y] >= rowThreshold) {
 
-            minY = Math.min(minY, y);
-            maxY = Math.max(maxY, y);
+            if (minY === height) {
+                minY = y;
+            }
 
+            maxY = y;
         }
-
     }
 
 
@@ -730,17 +773,22 @@ function detectColorBounds(imageData, maskInfo) {
 
         if (colCounts[x] >= colThreshold) {
 
-            minX = Math.min(minX, x);
-            maxX = Math.max(maxX, x);
+            if (minX === width) {
+                minX = x;
+            }
 
+            maxX = x;
         }
-
     }
 
 
     /*
-        見つからなかった場合は
-        色のある全範囲を使用
+        ----------------------------------------
+        盤面候補が見つからない場合
+        ----------------------------------------
+        
+        完全に失敗させるのではなく、
+        元の方法に近い範囲を使用する。
     */
 
     if (
@@ -753,26 +801,29 @@ function detectColorBounds(imageData, maskInfo) {
         maxX = -1;
         maxY = -1;
 
+
         for (let y = 0; y < height; y++) {
 
             for (let x = 0; x < width; x++) {
 
                 if (mask[y * width + x]) {
 
-                    minX = Math.min(minX, x);
-                    maxX = Math.max(maxX, x);
-
-                    minY = Math.min(minY, y);
-                    maxY = Math.max(maxY, y);
+                    if (x < minX) minX = x;
+                    if (x > maxX) maxX = x;
+                    if (y < minY) minY = y;
+                    if (y > maxY) maxY = y;
 
                 }
-
             }
-
         }
-
     }
 
+
+    /*
+        ----------------------------------------
+        最終確認
+        ----------------------------------------
+    */
 
     if (
         minX >= maxX ||
